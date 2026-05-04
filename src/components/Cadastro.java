@@ -4,7 +4,6 @@ import enums.PetSexo;
 import enums.PetTipo;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -43,13 +42,15 @@ public class Cadastro {
         System.out.println();
 
         for (int i = 0; i < perguntas.size(); i++) {
-            System.out.println(perguntas.get(i) + " ");
+            System.out.print(perguntas.get(i) + " ");
             String resposta = sc.nextLine();
             acoes.get(i).accept(resposta);
         }
 
         if (Cadastro.criarArquivo(pet)) {
+            System.out.println();
             System.out.println("O pet foi cadastrado com sucesso! Verifique as informações abaixo.");
+            System.out.println();
             System.out.println(pet);
         } else {
             System.out.println("Ocorreu um erro ao cadastrar seu pet.");
@@ -57,17 +58,24 @@ public class Cadastro {
     }
 
     public static boolean criarArquivo(Pet pet) {
+        Number peso;
+        if (pet.getPeso() % 1 == 0) {
+            peso = (int) pet.getPeso();
+        } else {
+            peso = pet.getPeso();
+        }
+
         List<String> dados = List.of(
                 pet.getNomeCompleto(),
                 pet.getTipo().toString(),
                 pet.getSexo().toString(),
                 pet.getEndereco(),
-                String.valueOf(pet.getIdade()),
-                String.valueOf(pet.getPeso()),
+                pet.getIdade() + " anos",
+                peso + "kg",
                 pet.getRaca()
         );
 
-        File directory = new File("src/petsRegistrados");
+        File directory = new File("src/petsCadastrados");
         if (!directory.exists()) {
             directory.mkdirs();
         }
@@ -90,8 +98,6 @@ public class Cadastro {
             return false;
         }
 
-        System.out.println(directory.exists());
-        System.out.println(file.getAbsolutePath());
         return true;
     }
 }
