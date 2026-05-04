@@ -11,7 +11,8 @@ public class Main {
         Sistema.mostrarMenu();
         String escolha = sc.nextLine();
 
-        Sistema.processarEscolha(escolha);
+        Sistema.processarEscolha(escolha, sc);
 
+        sc.close();
     }
 }

@@ -4,57 +4,50 @@ import enums.PetSexo;
 import enums.PetTipo;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Cadastro {
 
-    public static void coletarInfo () {
+    public static void coletarInfo (Scanner sc) {
         System.out.println();
         System.out.println("FORMULÁRIO DE CADASTRO");
 
         Pet pet = new Pet();
-        Scanner sc = new Scanner(System.in);
-
-        Map<String, Consumer<String>> map = new HashMap<>();
-
-        map.put("1", r -> pet.setNomeCompleto(Validador.validarNomeCompleto(r)));
-        map.put("2", r -> pet.setTipo(PetTipo.valueOf(r.toUpperCase())));
-        map.put("3", r -> pet.setSexo(PetSexo.valueOf(r.toUpperCase())));
-        map.put("4", pet::setEndereco);
-        map.put("5", r -> pet.setIdade(Validador.validarIdade(r.replace(",", "."))));
-        map.put("6", r -> pet.setPeso(Validador.validarPeso(r.replace(",", "."))));
-        map.put("7", r -> pet.setRaca(Validador.validarNome(r)));
-
-        System.out.println("Responda às perguntas abaixo:");
+        List<String> perguntas = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("formulario.txt"))) {
             String line = br.readLine();
-
             while (line != null) {
-                System.out.print(line + " ");
-                String resposta = sc.nextLine();
-
-                // vai receber o numero da pergunta
-                String chave = line.split(" - ")[0];
-
-                Consumer<String> acao = map.get(chave);
-
-                if (acao != null) {
-                    acao.accept(resposta);
-                }
-
+                perguntas.add(line);
                 line = br.readLine();
             }
-        } catch (IOException exception) {
-            exception.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+        List<Consumer<String>> acoes = List.of(
+                r -> pet.setNomeCompleto(Validador.validarNomeCompleto(r)),
+                r -> pet.setTipo(PetTipo.valueOf(r.toUpperCase())),
+                r -> pet.setSexo(PetSexo.valueOf(r.toUpperCase())),
+                pet::setEndereco,
+                r -> pet.setIdade(Validador.validarIdade(r)),
+                r -> pet.setPeso(Validador.validarPeso(r)),
+                r -> pet.setRaca(Validador.validarNome(r))
+        );
+
+        System.out.println("Responda às perguntas abaixo:");
         System.out.println();
+
+        for (int i = 0; i < perguntas.size(); i++) {
+            System.out.println(perguntas.get(i) + " ");
+            String resposta = sc.nextLine();
+            acoes.get(i).accept(resposta);
+        }
+
         if (Cadastro.criarArquivo(pet)) {
             System.out.println("O pet foi cadastrado com sucesso! Verifique as informações abaixo.");
             System.out.println(pet);
@@ -64,6 +57,16 @@ public class Cadastro {
     }
 
     public static boolean criarArquivo(Pet pet) {
+        List<String> dados = List.of(
+                pet.getNomeCompleto(),
+                pet.getTipo().toString(),
+                pet.getSexo().toString(),
+                pet.getEndereco(),
+                String.valueOf(pet.getIdade()),
+                String.valueOf(pet.getPeso()),
+                pet.getRaca()
+        );
+
         File directory = new File("src/petsRegistrados");
         if (!directory.exists()) {
             directory.mkdirs();
@@ -78,20 +81,10 @@ public class Cadastro {
         File file = new File(directory, fileName);
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-            bw.write("1 - " + pet.getNomeCompleto());
-            bw.newLine();
-            bw.write("2 - " + pet.getTipo());
-            bw.newLine();
-            bw.write("3 - " + pet.getSexo());
-            bw.newLine();
-            bw.write("4 - " + pet.getEndereco());
-            bw.newLine();
-            bw.write("5 - " + pet.getIdade());
-            bw.newLine();
-            bw.write("6 - " + pet.getPeso());
-            bw.newLine();
-            bw.write("7 - " + pet.getRaca());
-            bw.newLine();
+            for (int i = 0; i < dados.size(); i++) {
+                bw.write((i + 1) + " - " + dados.get(i));
+                bw.newLine();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;

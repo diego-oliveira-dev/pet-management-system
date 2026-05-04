@@ -45,7 +45,7 @@ public class Validador {
     public static int validarIdade(String idadeString) {
         int idade;
         try {
-            idade = Integer.parseInt(idadeString);
+            idade = Integer.parseInt(idadeString.replace(",", "."));
         } catch (Exception e) {
             throw new IllegalArgumentException("Idade inválida!");
         }
@@ -58,7 +58,7 @@ public class Validador {
     public static double validarPeso(String pesoString) {
         double peso;
         try {
-            peso = Double.parseDouble(pesoString);
+            peso = Double.parseDouble(pesoString.replace(",", "."));
         } catch (Exception e) {
             throw new IllegalArgumentException("Peso inválida!");
         }
