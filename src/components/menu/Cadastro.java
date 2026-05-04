@@ -1,5 +1,7 @@
-package components;
+package components.menu;
 
+import components.Pet;
+import components.Validador;
 import enums.PetSexo;
 import enums.PetTipo;
 
@@ -11,7 +13,7 @@ import java.util.function.Consumer;
 
 public class Cadastro {
 
-    public static void coletarInfo (Scanner sc) {
+    public static void cadastrarPet (Scanner sc) {
         System.out.println();
         System.out.println("FORMULÁRIO DE CADASTRO");
 

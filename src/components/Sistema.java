@@ -1,5 +1,8 @@
 package components;
 
+import components.menu.Cadastro;
+import components.menu.Searcher;
+
 import java.util.Scanner;
 
 public class Sistema {
@@ -26,9 +29,12 @@ public class Sistema {
         int escolhaInt = Integer.parseInt(escolha);
         switch (escolhaInt) {
             case 1:
-                Cadastro.coletarInfo(sc);
+                Cadastro.cadastrarPet(sc);
                 break;
             case 2:
+                // Posteriormente trocar os métodos abaixo por um único método do Sistema
+                // Será necessário refatorar o Sistema
+                Searcher.searchPets(sc);
                 System.out.println("Alterando dados de pet cadastrado...");
                 break;
             case 3:
