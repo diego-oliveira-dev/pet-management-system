@@ -19,7 +19,6 @@ public class Validador {
     }
 
     public static String validarNome(String nome) {
-        String[] campos = nome.trim().split("\\s+");
         String regex = "[^a-zA-ZÀ-ÿ\\s]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(nome.trim());
@@ -40,7 +39,6 @@ public class Validador {
         if (campos.length <= 1) {
             throw new IllegalArgumentException("Nome inválido!");
         }
-
         return nomeValido;
     }
 
@@ -64,11 +62,9 @@ public class Validador {
         } catch (Exception e) {
             throw new IllegalArgumentException("Peso inválida!");
         }
-
         if (peso > 60) {
             throw new IllegalArgumentException("Peso inválida!");
         }
-
         return peso;
     }
 

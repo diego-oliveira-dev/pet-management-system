@@ -18,19 +18,16 @@ public class Sistema {
 
     public static void processarEscolha(String escolha) {
         Scanner sc = new Scanner(System.in);
-
         while (!Validador.isEscolhaValida(escolha)) {
             System.out.println();
             System.out.println("Escolha inválida! Tente novamente.");
             Sistema.mostrarMenu();
             escolha = sc.nextLine();
         }
-
         int escolhaInt = Integer.parseInt(escolha);
-
         switch (escolhaInt) {
             case 1:
-                Processador.cadastrarPet();
+                Cadastro.coletarInfo();
                 break;
             case 2:
                 System.out.println("Alterando dados de pet cadastrado...");

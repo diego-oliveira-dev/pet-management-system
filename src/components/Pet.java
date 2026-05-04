@@ -43,17 +43,45 @@ public class Pet {
         this.raca = raca;
     }
 
+    public String getNomeCompleto() {
+        return nomeCompleto;
+    }
+
+    public PetTipo getTipo() {
+        return tipo;
+    }
+
+    public PetSexo getSexo() {
+        return sexo;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public int getIdade() {
+        return idade;
+    }
+
+    public double getPeso() {
+        return peso;
+    }
+
+    public String getRaca() {
+        return raca;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Nome: " + nomeCompleto + "\n");
-        sb.append("Tipo: " + tipo + "\n");
-        sb.append("Sexo: " + sexo + "\n");
-        sb.append("Endereço encontrado: " + endereco + "\n");
-        sb.append("Idade (em anos): " + idade + "\n");
-        sb.append("Peso (em kg): " + peso + "\n");
-        sb.append("Raça: " + raca);
+        sb.append("Nome: " + getNomeCompleto() + "\n");
+        sb.append("Tipo: " + getTipo() + "\n");
+        sb.append("Sexo: " + getSexo() + "\n");
+        sb.append("Endereço encontrado: " + getEndereco() + "\n");
+        sb.append("Idade (em anos): " + getIdade() + "\n");
+        sb.append("Peso (em kg): " + getPeso() + "\n");
+        sb.append("Raça: " + getRaca());
 
         return sb.toString();
     }
