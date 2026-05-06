@@ -11,6 +11,8 @@ import util.Validador;
 import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Cadastro {
 
@@ -51,6 +53,19 @@ public class Cadastro {
             System.out.println("Pet cadastrado com sucesso!");
         } else {
             System.out.println("Ocorreu um erro ao cadastrar.");
+        }
+    }
+
+    public static void alterarDados(Leitor leitor) {
+        UI.mostrarCriteriosDeBusca();
+        int criterioEscolhido = leitor.lerCriterio();
+        switch (criterioEscolhido) {
+            case 1:
+                UI.perguntarValorDoCriterio(1);
+                String valorDoCriterio = leitor.lerResposta();
+                File[] arquivos = ManipuladorDeArquivos.coletarDadosCadastrados();
+                Busca.listarPetsPorCriterio(arquivos, valorDoCriterio);
+                break;
         }
     }
 }

@@ -50,7 +50,7 @@ public class ManipuladorDeArquivos {
         return true;
     }
 
-    public File[] coletarDadosCadastrados() {
+    public static File[] coletarDadosCadastrados() {
         File diretorio = new File("dados/petsCadastrados");
         File[] arquivos = diretorio.listFiles();
         if (!Validador.isAlgumPetCadastrado(arquivos)) {
@@ -59,7 +59,7 @@ public class ManipuladorDeArquivos {
         return arquivos;
     }
 
-    public String coletarItemDaLista(File arquivo, StringBuilder sb) {
+    public static String coletarItemDaLista(File arquivo, StringBuilder sb) {
         try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
             String line = br.readLine();
             int j = 0;
@@ -77,5 +77,9 @@ public class ManipuladorDeArquivos {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    public static void procurarValorNaLista(String valor) {
+        File[] arquivos = coletarDadosCadastrados();
     }
 }

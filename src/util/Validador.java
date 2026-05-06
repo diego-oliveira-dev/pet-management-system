@@ -20,7 +20,6 @@ public class Validador {
     }
 
     public static String validarNome(String nome) {
-        // inserir hifen como elemento válido da string
         String regex = "[^a-zA-ZÀ-ÿ\\s\\-]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(nome.trim());
@@ -73,5 +72,32 @@ public class Validador {
             return false;
         }
         return true;
+    }
+
+    public static boolean isCriterioValido(String criterio) {
+        // caso 1: apenas um criterio
+        int criterioInt;
+        try {
+            criterioInt = Integer.parseInt(criterio);
+        } catch (Exception e) {
+            return false;
+        }
+        return criterioInt >= 1 && criterioInt <= 6;
+        // caso 2: dois criterios
+//        if (criterios.length == 2) {
+//            int criterio1, criterio2;
+//            try {
+//                criterio1 = Integer.parseInt(criterios[0]);
+//                criterio2 = Integer.parseInt(criterios[1]);
+//            } catch (Exception e) {
+//                return false;
+//            }
+//            return (criterio1 >= 1 && criterio1 <= 6)
+//                    && (criterio2 >= 1 && criterio2 <= 6);
+//        }
+    }
+
+    public static boolean isDoisCriterios(String resposta) {
+        return resposta.split(" E ").length == 2;
     }
 }

@@ -18,8 +18,8 @@ public class Sistema {
                 Cadastro.cadastrarPet(leitor);
                 break;
             case 2:
-                //service.Searcher.searchPets(sc);
-                Busca.listarPets();
+                Cadastro.alterarDados(leitor);
+                //Modificador.alterarDadosCadastrais(leitor);
                 System.out.println("Alterando dados de pet cadastrado...");
                 break;
             case 3:

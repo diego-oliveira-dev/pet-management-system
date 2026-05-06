@@ -20,4 +20,14 @@ public class Leitor {
         }
         return Integer.parseInt(resposta);
     }
+
+    public int lerCriterio() {
+        String resposta = SC.nextLine();
+        while (!Validador.isCriterioValido(resposta)) {
+            System.out.println();
+            System.out.print("Critério inválido! Tente novamente: ");
+            resposta = SC.nextLine();
+        }
+        return Integer.parseInt(resposta);
+    }
 }
