@@ -82,7 +82,7 @@ public class Validador {
         } catch (Exception e) {
             return false;
         }
-        return criterioInt >= 1 && criterioInt <= 6;
+        return criterioInt >= 1 && criterioInt <= 7;
         // caso 2: dois criterios
 //        if (criterios.length == 2) {
 //            int criterio1, criterio2;

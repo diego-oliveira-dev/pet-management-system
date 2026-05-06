@@ -32,11 +32,12 @@ public class UI {
         System.out.println("=== CRITÉRIOS DE BUSCA ===");
         System.out.println("""
                 1. Nome
-                2. Sexo
-                3. Idade
-                4. Peso
-                5. Raça
-                6. Endereço""");
+                2. Tipo
+                3. Sexo
+                4. Idade
+                5. Peso
+                6. Endereço
+                7. Raça""");
         System.out.println("==========================");
         System.out.print("Selecione o critério: ");
     }
@@ -48,10 +49,10 @@ public class UI {
                 valorDoCriterio = "nome";
                 break;
             case 2:
-                valorDoCriterio = "tipo";
+                valorDoCriterio = "tipo (Cachorro/gato)";
                 break;
             case 3:
-                valorDoCriterio = "sexo";
+                valorDoCriterio = "sexo (Macho/femea)";
                 break;
             case 4:
                 valorDoCriterio = "endereço";

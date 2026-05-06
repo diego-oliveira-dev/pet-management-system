@@ -13,20 +13,19 @@ import java.util.regex.Pattern;
 
 public class Busca {
 
-    public static void listarPets() {
-        ManipuladorDeArquivos fileHandler = new ManipuladorDeArquivos();
-        File[] arquivos = fileHandler.coletarDadosCadastrados();
+    public static void listarPetsCadastrados() {
+        File[] arquivos = ManipuladorDeArquivos.coletarDadosCadastrados();
         List<String> lista = new ArrayList<>();
         for (int i = 0; i < arquivos.length; i++) {
             StringBuilder sb = new StringBuilder();
             sb.append((i + 1) + ". ");
-            String item = fileHandler.coletarItemDaLista(arquivos[i], sb);
+            String item = ManipuladorDeArquivos.coletarItemDaLista(arquivos[i], sb);
             lista.add(item);
         }
         lista.forEach(System.out::println);
     }
 
-    public static void listarPetsPorCriterio(File[] arquivos, String valorDoCriterio) {
+    public static void listarPetsPorCriterio(File[] arquivos, String valorDoCriterio, String k) {
         List<String> lista = new ArrayList<>();
         int j = 0;
         for (int i = 0; i < arquivos.length; i++) {
@@ -37,7 +36,7 @@ public class Busca {
                     Pattern pattern = Pattern.compile(valorDoCriterio);
                     Matcher matcher = pattern.matcher(campos[1]);
                     boolean encontrou = matcher.find();
-                    if (campos[0].equals("1")
+                    if (campos[0].equals(k)
                             && encontrou) {
                         StringBuilder sb = new StringBuilder();
                         sb.append((j + 1) + ". ");
@@ -51,6 +50,7 @@ public class Busca {
                 e.printStackTrace();
             }
         }
+        System.out.println();
         lista.forEach(System.out::println);
     }
 }
