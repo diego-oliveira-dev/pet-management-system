@@ -25,7 +25,7 @@ public class Busca {
         lista.forEach(System.out::println);
     }
 
-    public static void listarPetsPorCriterio(File[] arquivos, String valorDoCriterio, String k) {
+    public static List<String> listarPetsPorCriterio(File[] arquivos, String valorDoCriterio, String k) {
         List<String> lista = new ArrayList<>();
         int j = 0;
         for (int i = 0; i < arquivos.length; i++) {
@@ -52,5 +52,6 @@ public class Busca {
         }
         System.out.println();
         lista.forEach(System.out::println);
+        return lista;
     }
 }

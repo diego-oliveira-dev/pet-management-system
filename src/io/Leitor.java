@@ -2,6 +2,7 @@ package io;
 
 import util.Validador;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Leitor {
@@ -26,6 +27,26 @@ public class Leitor {
         while (!Validador.isCriterioValido(resposta)) {
             System.out.println();
             System.out.print("Critério inválido! Tente novamente: ");
+            resposta = SC.nextLine();
+        }
+        return Integer.parseInt(resposta);
+    }
+
+    public int lerPetEscolhido(List<String> lista) {
+        String resposta = SC.nextLine();
+        while(!Validador.isPetEscolhidoValido(resposta, lista)) {
+            System.out.println();
+            System.out.print("Input inválido! Tente novamente: ");
+            resposta = SC.nextLine();
+        }
+        return Integer.parseInt(resposta);
+    }
+
+    public int lerDadoASerAlterado() {
+        String resposta = SC.nextLine();
+        while(!Validador.isDadoValido(resposta)) {
+            System.out.println();
+            System.out.print("Dado inválido! Tente novamente: ");
             resposta = SC.nextLine();
         }
         return Integer.parseInt(resposta);

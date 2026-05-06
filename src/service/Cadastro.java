@@ -35,6 +35,32 @@ public class Cadastro {
         salvarInfoEmArquivo(pet);
     }
 
+    public static void alterarDados(int petEscolhido, List<String> lista, Leitor leitor) {
+        UI.perguntarDadoASerAlterado();
+        int escolha = leitor.lerDadoASerAlterado();
+        String petDados = lista.get(petEscolhido - 1).split("\\. ")[1];
+        File[] arquivos = ManipuladorDeArquivos.coletarDadosCadastrados();
+        String petAnalisado;
+        for (int i = 0; i < arquivos.length; i++) {
+            StringBuilder sb = new StringBuilder();
+            petAnalisado = ManipuladorDeArquivos.coletarItemDaLista(arquivos[i], sb);
+            if ((petDados.equals(petAnalisado))) {
+                Pet pet = ManipuladorDeArquivos.lerPetDoArquivo(arquivos[i]);
+                List<Consumer<String>> acoes = List.of(
+                        r -> pet.setNomeCompleto(Validador.validarNomeCompleto(r)),
+                        r -> pet.setIdade(Validador.validarIdade(r.split(" ")[0])),
+                        r -> pet.setPeso(Validador.validarPeso(r.split(" ")[0])),
+                        pet::setEndereco,
+                        r -> pet.setRaca(Validador.validarNome(r))
+                        );
+                System.out.print("Novo valor: ");
+                String novoDado = leitor.lerResposta();
+                acoes.get(escolha - 1).accept(novoDado);
+                salvarInfoEmArquivo(pet);
+            }
+        }
+    }
+
     public static void salvarInfoEmArquivo(Pet pet) {
         List<String> dadosDoPet = List.of(
                 pet.getNomeCompleto(),
@@ -52,5 +78,9 @@ public class Cadastro {
         } else {
             System.out.println("Ocorreu um erro ao cadastrar.");
         }
+    }
+
+    public static void atualizarInfoEmArquivo(Pet pet) {
+
     }
 }

@@ -69,4 +69,21 @@ public class UI {
         }
         System.out.print("Qual " + valorDoCriterio + "? ");
     }
+
+    public static void perguntarPetEscolhido() {
+        System.out.println();
+        System.out.print("Qual o pet escolhido para a alteração cadastral? ");
+    }
+
+    public static void perguntarDadoASerAlterado() {
+        System.out.println();
+        System.out.println("=== DADOS QUE PODEM SER ALTERADOS ===");
+        System.out.println("""
+                1. Nome
+                2. Idade
+                3. Peso
+                4. Endereço
+                5. Raça""");
+        System.out.print("Informe o dado a ser alterado: ");
+    }
 }

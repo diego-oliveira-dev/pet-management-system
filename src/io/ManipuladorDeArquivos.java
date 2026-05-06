@@ -1,6 +1,8 @@
 package io;
 
 import entities.Pet;
+import entities.PetSexo;
+import entities.PetTipo;
 import util.Validador;
 
 import java.io.*;
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ManipuladorDeArquivos {
     public static List<String> lerFormularioDeCadastro() {
@@ -38,7 +41,7 @@ public class ManipuladorDeArquivos {
     }
 
     public static boolean salvarDadosNoArquivo(File file, List<String> dados) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             for (int i = 0; i < dados.size(); i++) {
                 bw.write((i + 1) + " - " + dados.get(i));
                 bw.newLine();
@@ -79,7 +82,29 @@ public class ManipuladorDeArquivos {
         return sb.toString();
     }
 
-    public static void procurarValorNaLista(String valor) {
-        File[] arquivos = coletarDadosCadastrados();
+    public static Pet lerPetDoArquivo(File file) {
+        Pet pet = new Pet();
+        List<Consumer<String>> acoes = List.of(
+                r -> pet.setNomeCompleto(Validador.validarNomeCompleto(r)),
+                r -> pet.setTipo(PetTipo.valueOf(r.toUpperCase())),
+                r -> pet.setSexo(PetSexo.valueOf(r.toUpperCase())),
+                pet::setEndereco,
+                r -> pet.setIdade(Validador.validarIdade(r.split(" ")[0])),
+                r -> pet.setPeso(Validador.validarPeso(r.split(" ")[0])),
+                r -> pet.setRaca(Validador.validarNome(r))
+        );
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            int i = 0;
+            while (line != null) {
+                String valor = line.split(" - ")[1];
+                acoes.get(i).accept(valor);
+                i++;
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return pet;
     }
 }

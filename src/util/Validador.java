@@ -1,6 +1,7 @@
 package util;
 
 import java.io.File;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,5 +100,31 @@ public class Validador {
 
     public static boolean isDoisCriterios(String resposta) {
         return resposta.split(" E ").length == 2;
+    }
+
+    public static boolean isPetEscolhidoValido(String escolha, List<String> lista) {
+        int escolhaInt;
+        try {
+            escolhaInt = Integer.parseInt(escolha);
+        } catch (Exception e) {
+            return false;
+        }
+        if (escolhaInt < 1 || escolhaInt > lista.size()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isDadoValido(String escolha) {
+        int escolhaInt;
+        try {
+            escolhaInt = Integer.parseInt(escolha);
+        } catch (Exception e) {
+            return false;
+        }
+        if (escolhaInt < 1 || escolhaInt > 5) {
+            return false;
+        }
+        return true;
     }
 }

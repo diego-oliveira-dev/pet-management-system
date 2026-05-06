@@ -5,6 +5,7 @@ import io.ManipuladorDeArquivos;
 import io.UI;
 
 import java.io.File;
+import java.util.List;
 
 public class Sistema {
     public Leitor leitor = new Leitor();
@@ -21,9 +22,10 @@ public class Sistema {
                 Cadastro.cadastrarPet(leitor);
                 break;
             case 2:
-                processarBuscaPorCriterio(leitor);
-                // Cadastro.alterarDados(leitor);
-                System.out.println("Alterando dados de pet cadastrado...");
+                List<String> lista = processarBuscaPorCriterio(leitor);
+                UI.perguntarPetEscolhido();
+                int petEscolhido = leitor.lerPetEscolhido(lista);
+                Cadastro.alterarDados(petEscolhido, lista, leitor);
                 break;
             case 3:
                 System.out.println("Deletando pet cadastrado...");
@@ -40,16 +42,17 @@ public class Sistema {
         }
     }
 
-    public static void processarBuscaPorCriterio(Leitor leitor) {
+    public static List<String> processarBuscaPorCriterio(Leitor leitor) {
         UI.mostrarCriteriosDeBusca();
         int criterioEscolhido = leitor.lerCriterio();
         UI.perguntarValorDoCriterio(criterioEscolhido);
         String valorDoCriterio = leitor.lerResposta();
         File[] arquivos = ManipuladorDeArquivos.coletarDadosCadastrados();
-        Busca.listarPetsPorCriterio(
+        List<String> lista = Busca.listarPetsPorCriterio(
                 arquivos,
                 valorDoCriterio,
                 String.valueOf(criterioEscolhido)
         );
+        return lista;
     }
 }
