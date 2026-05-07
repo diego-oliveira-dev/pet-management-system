@@ -32,10 +32,15 @@ public class Cadastro {
             String resposta = leitor.lerResposta();
             acoes.get(i).accept(resposta);
         }
-        salvarInfoEmArquivo(pet);
+        boolean foiSalvo = salvarInfoEmArquivo(pet);
+        if (foiSalvo) {
+            System.out.println("Pet cadastrado com sucesso!");
+        } else {
+            System.out.println("Ocorreu um erro ao cadastrar.");
+        }
     }
 
-    public static void salvarInfoEmArquivo(Pet pet) {
+    public static boolean salvarInfoEmArquivo(Pet pet) {
         List<String> dadosDoPet = List.of(
                 pet.getNomeCompleto(),
                 pet.getTipo().toString(),
@@ -46,12 +51,7 @@ public class Cadastro {
                 pet.getRaca()
         );
         File file = ManipuladorDeArquivos.criarArquivo(pet);
-        boolean arquivoSalvo = ManipuladorDeArquivos.salvarDadosNoArquivo(file, dadosDoPet);
-        if (arquivoSalvo) {
-            System.out.println("Pet cadastrado com sucesso!");
-        } else {
-            System.out.println("Ocorreu um erro ao cadastrar.");
-        }
+        return ManipuladorDeArquivos.salvarDadosNoArquivo(file, dadosDoPet);
     }
 
     public static void alterarDados(int petEscolhido, List<String> lista, Leitor leitor) {
@@ -64,7 +64,7 @@ public class Cadastro {
             StringBuilder sb = new StringBuilder();
             petAnalisado = ManipuladorDeArquivos.coletarItemDaLista(arquivos[i], sb);
             if ((petDados.equals(petAnalisado))) {
-                Pet pet = ManipuladorDeArquivos.lerPetDoArquivo(arquivos[i]);
+                Pet pet = ManipuladorDeArquivos.lerPetPeloArquivo(arquivos[i]);
                 List<Consumer<String>> acoes = List.of(
                         r -> pet.setNomeCompleto(Validador.validarNomeCompleto(r)),
                         r -> pet.setIdade(Validador.validarIdade(r.split(" ")[0])),
@@ -75,6 +75,7 @@ public class Cadastro {
                 System.out.print("Novo valor: ");
                 String novoDado = leitor.lerResposta();
                 acoes.get(escolha - 1).accept(novoDado);
+                ManipuladorDeArquivos.apagarArquivoDoPet(arquivos[i]);
                 salvarInfoEmArquivo(pet);
             }
         }

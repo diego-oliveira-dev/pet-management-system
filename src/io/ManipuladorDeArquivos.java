@@ -82,7 +82,7 @@ public class ManipuladorDeArquivos {
         return sb.toString();
     }
 
-    public static Pet lerPetDoArquivo(File file) {
+    public static Pet lerPetPeloArquivo(File file) {
         Pet pet = new Pet();
         List<Consumer<String>> acoes = List.of(
                 r -> pet.setNomeCompleto(Validador.validarNomeCompleto(r)),

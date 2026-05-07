@@ -72,7 +72,7 @@ public class UI {
 
     public static void perguntarPetEscolhido() {
         System.out.println();
-        System.out.print("Qual o pet escolhido para a alteração cadastral? ");
+        System.out.print("Qual o pet escolhido? ");
     }
 
     public static void perguntarDadoASerAlterado() {

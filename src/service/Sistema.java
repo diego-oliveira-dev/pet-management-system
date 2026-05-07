@@ -33,7 +33,6 @@ public class Sistema {
                 UI.perguntarPetEscolhido();
                 int petEscolhido = leitor.lerPetEscolhido(lista);
                 Cadastro.removerPet(petEscolhido, lista, leitor);
-                System.out.println("Deletando pet cadastrado...");
                 break;
             }
             case 4:
