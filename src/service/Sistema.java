@@ -21,15 +21,21 @@ public class Sistema {
             case 1:
                 Cadastro.cadastrarPet(leitor);
                 break;
-            case 2:
+            case 2: {
                 List<String> lista = processarBuscaPorCriterio(leitor);
                 UI.perguntarPetEscolhido();
                 int petEscolhido = leitor.lerPetEscolhido(lista);
                 Cadastro.alterarDados(petEscolhido, lista, leitor);
                 break;
-            case 3:
+            }
+            case 3: {
+                List<String> lista = processarBuscaPorCriterio(leitor);
+                UI.perguntarPetEscolhido();
+                int petEscolhido = leitor.lerPetEscolhido(lista);
+                Cadastro.removerPet(petEscolhido, lista, leitor);
                 System.out.println("Deletando pet cadastrado...");
                 break;
+            }
             case 4:
                 Busca.listarPetsCadastrados();
                 break;

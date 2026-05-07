@@ -22,6 +22,7 @@ public class Busca {
             String item = ManipuladorDeArquivos.coletarItemDaLista(arquivos[i], sb);
             lista.add(item);
         }
+        System.out.println();
         lista.forEach(System.out::println);
     }
 

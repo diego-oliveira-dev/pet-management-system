@@ -107,4 +107,11 @@ public class ManipuladorDeArquivos {
         }
         return pet;
     }
+
+    public static boolean apagarArquivoDoPet(File arquivo) {
+        if (arquivo.exists()) {
+            return arquivo.delete();
+        }
+        return false;
+    }
 }

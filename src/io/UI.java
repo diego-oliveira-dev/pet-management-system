@@ -34,9 +34,9 @@ public class UI {
                 1. Nome
                 2. Tipo
                 3. Sexo
-                4. Idade
-                5. Peso
-                6. Endereço
+                4. Endereço
+                5. Idade
+                6. Peso
                 7. Raça""");
         System.out.println("==========================");
         System.out.print("Selecione o critério: ");
@@ -49,10 +49,10 @@ public class UI {
                 valorDoCriterio = "nome";
                 break;
             case 2:
-                valorDoCriterio = "tipo (Cachorro/gato)";
+                valorDoCriterio = "tipo (CACHORRO/GATO)";
                 break;
             case 3:
-                valorDoCriterio = "sexo (Macho/femea)";
+                valorDoCriterio = "sexo (MACHO/FEMEA)";
                 break;
             case 4:
                 valorDoCriterio = "endereço";
