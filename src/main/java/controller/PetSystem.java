@@ -1,5 +1,6 @@
 package controller;
 
+import service.PetFinderService;
 import service.PetService;
 import view.UserInterface;
 
@@ -15,16 +16,32 @@ public class PetSystem {
         switch (choice) {
             case 1:
                 PetService.save();
+                checkSystemUsage();
+                break;
+            case 3:
+                PetService.delete();
+                checkSystemUsage();
                 break;
             case 4:
-                PetService.findAll();
+                PetFinderService.findAll();
+                checkSystemUsage();
                 break;
             case 5:
-                PetService.findByCriteria();
+                PetFinderService.findByCriteria();
+                checkSystemUsage();
                 break;
             case 6:
-                System.out.println("Encerrando o sistema...");
+                shutDown();
+                break;
         }
-        start();
+    }
+
+    public void checkSystemUsage() {
+        if (UserInterface.checkSystemUsage()) start();
+        else shutDown();
+    }
+
+    public void shutDown() {
+        UserInterface.shuttingDown();
     }
 }

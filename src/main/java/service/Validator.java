@@ -3,7 +3,6 @@ package service;
 import lombok.extern.log4j.Log4j2;
 
 import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,19 +36,18 @@ public class Validator {
                 || sex.trim().equalsIgnoreCase("femea");
     }
 
-    public static String normalizeText(String providedSex) {
-        String normalizedInput = Normalizer.normalize(providedSex, Normalizer.Form.NFD);
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        return pattern.matcher(normalizedInput).replaceAll("");
-    }
-
-    public static boolean isAgeValid(String providedAge) {
-        int age;
+    public static boolean isInteger(String providedAge) {
         try {
-            age = Integer.parseInt(providedAge);
+            Integer.parseInt(providedAge);
         } catch (Exception e) {
             return false;
         }
+        return true;
+    }
+
+    public static boolean isAgeValid(String providedAge) {
+        if (!isInteger(providedAge)) return false;
+        int age = Integer.parseInt(providedAge);
         return age > 0 && age <= 20;
     }
 
@@ -64,34 +62,14 @@ public class Validator {
     }
 
     public static boolean isAnswerValid(String providedAnswer) {
-        String normalizedInput = Normalizer.normalize(providedAnswer, Normalizer.Form.NFD);
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        String answer = pattern.matcher(normalizedInput).replaceAll("");
+        String answer = normalizeText(providedAnswer);
         return answer.trim().equalsIgnoreCase("sim")
                 || answer.trim().equalsIgnoreCase("nao");
     }
 
-    public static boolean isCriteriaValid(String criteria) {
-        String[] fields = convertInputIntoStringArray(criteria);
-        if (fields.length == 1) {
-            return isChoiceValid(criteria.trim());
-        }
-        if (fields.length == 2) {
-            for (String s : fields) {
-                if (!isChoiceValid(s)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public static String[] convertInputIntoStringArray(String criteria) {
-        return Arrays.stream(criteria
-                        .trim()
-                        .split(" "))
-                .filter(c -> c.matches("(\\d+)"))
-                .toArray(String[]::new);
+    public static String normalizeText(String input) {
+        String normalizedInput = Normalizer.normalize(input, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(normalizedInput).replaceAll("");
     }
 }

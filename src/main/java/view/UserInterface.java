@@ -137,9 +137,47 @@ public class UserInterface {
         }
     }
 
+    public static boolean isUserSearchingByCriteria() {
+        System.out.println();
+        System.out.print("Deseja procurar por algum critério em específico (Sim/Não)? ");
+        String answer = SC.nextLine();
+        while (!Validator.isAnswerValid(answer)) {
+            System.out.print("Resposta inválida! Tente novamente: ");
+            answer = SC.nextLine();
+        }
+        return answer.equalsIgnoreCase("sim");
+    }
+
+    public static String askForPetToDelete() {
+        System.out.println();
+        System.out.print("Digite o ID do pet que deseja deletar: ");
+        String petId = SC.nextLine();
+        while (!Validator.isInteger(petId)) {
+            System.out.print("ID inválido! Tente novamente: ");
+            petId = SC.nextLine();
+        }
+        return petId;
+    }
+
+    public static boolean doubleCheck() {
+        System.out.println();
+        System.out.print("Tem certeza que deseja apagar o cadastro do pet selecionado (Sim/Não)? ");
+        String answer = SC.nextLine();
+        while (!Validator.isAnswerValid(answer)) {
+            System.out.print("Resposta inválida! Tente novamente: ");
+            answer = SC.nextLine();
+        }
+        return answer.equalsIgnoreCase("sim");
+    }
+
+    public static void confirmDelete() {
+        System.out.println();
+        System.out.println("O pet foi apagado com sucesso.");
+    }
+
     public static int askForCriteria() {
         System.out.println();
-        System.out.println("Selecione um ou dois critérios abaixo.");
+        System.out.println("Selecione um dos critérios abaixo.");
         System.out.println("""
                 1. Nome
                 2. Sexo
@@ -148,7 +186,7 @@ public class UserInterface {
                 5. Raça
                 6. Endereço
                 """);
-        System.out.print("Digite o(s) critério(s) desejado(s): ");
+        System.out.print("Digite o critério desejado: ");
         return readCriteria();
     }
 
@@ -161,26 +199,89 @@ public class UserInterface {
         return Integer.parseInt(criteria);
     }
 
-    public static String askForCriteriaValue() {
-        System.out.print("Pesquise: ");
+    public static String askNameToSearchFor() {
+        System.out.print("Nome a ser procurado: ");
+        return SC.nextLine();
+    }
+
+    public static String askSexToSearchFor() {
+        System.out.print("Sexo a ser procurado (MACHO/FEMEA): ");
+        String providedSex = SC.nextLine();
+        while (!Validator.isSexValid(providedSex)) {
+            System.out.print("Sexo inválido! Tente novamente: ");
+            providedSex = SC.nextLine();
+        }
+        return providedSex;
+    }
+
+    public static String askAgeToSearchFor() {
+        System.out.print("Idade a ser procurada: ");
+        String providedAge = SC.nextLine();
+        while (!Validator.isAgeValid(providedAge)) {
+            System.out.print("Idade inválida! Tente novamente: ");
+            providedAge = SC.nextLine();
+        }
+        return providedAge;
+    }
+
+    public static String askWeightToSearchFor() {
+        System.out.print("Peso a ser procurada: ");
+        String providedWeight = SC.nextLine();
+        while (!Validator.isWeightValid(providedWeight)) {
+            System.out.print("Peso inválido! Tente novamente: ");
+            providedWeight = SC.nextLine();
+        }
+        return providedWeight;
+    }
+
+    public static String askRaceToSearchFor() {
+        System.out.print("Nome de raça a ser procurado: ");
+        String providedRace = SC.nextLine();
+        while (!Validator.isNameValid(providedRace)) {
+            System.out.print("Nome de raça inválido! Tente novamente: ");
+            providedRace = SC.nextLine();
+        }
+        return providedRace;
+    }
+
+    public static String askAddressToSearchFor() {
+        System.out.print("Dados do endereço a ser procurado: ");
         return SC.nextLine();
     }
 
     public static void showSearchResult(List<Pet> pets) {
+        System.out.println();
         if (pets.isEmpty()) {
-            System.out.println("Nenhum pet foi encontrado com o nome fornecido.");
+            System.out.println("Nenhum pet foi encontrado.");
+        } else {
+            pets.forEach(
+                    p -> System.out.println(
+                            "ID " + p.getId() + " - "
+                                    + p.getName() + " - "
+                                    + p.getType() + " - "
+                                    + p.getSex() + " - "
+                                    + p.getAddress() + " - "
+                                    + p.getAge() + " anos - "
+                                    + p.getWeight() + " kg - "
+                                    + p.getRace()
+                    )
+            );
         }
-        pets.forEach(
-                p -> System.out.println(
-                        "ID " + p.getId() + " - "
-                                + p.getName() + " - "
-                                + p.getType() + " - "
-                                + p.getSex() + " - "
-                                + p.getAddress() + " - "
-                                + p.getAge() + " anos - "
-                                + p.getWeight() + " kg - "
-                                + p.getRace()
-                )
-        );
+    }
+
+    public static boolean checkSystemUsage() {
+        System.out.println();
+        System.out.print("Deseja continuar usando o sistema (Sim/Não)? ");
+        String answer = SC.nextLine();
+        while (!Validator.isAnswerValid(answer)) {
+            System.out.print("Resposta inválida! Tente novamente: ");
+            answer = SC.nextLine();
+        }
+        return answer.equalsIgnoreCase("sim");
+    }
+
+    public static void shuttingDown() {
+        System.out.println();
+        System.out.println("Encerrando o sistema...");
     }
 }
