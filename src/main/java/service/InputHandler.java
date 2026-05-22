@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Log4j2
-public class Validator {
+public class InputHandler {
     public static boolean isChoiceValid(String input) {
         int choice;
         try {

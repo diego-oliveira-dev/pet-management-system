@@ -1,7 +1,7 @@
 package view;
 
 import domain.Pet;
-import service.Validator;
+import service.InputHandler;
 
 import java.util.List;
 import java.util.Scanner;
@@ -25,7 +25,7 @@ public class UserInterface {
 
     public static int readChoice() {
         String choice = SC.nextLine();
-        while (!Validator.isChoiceValid(choice)) {
+        while (!InputHandler.isChoiceValid(choice)) {
             System.out.print("  Input inválido! Tente novamente: ");
             choice = SC.nextLine();
         }
@@ -38,7 +38,7 @@ public class UserInterface {
         System.out.println("Responda às perguntas abaixo:");
         System.out.print("1 - Qual o nome do pet? ");
         String providedName = SC.nextLine();
-        while (!Validator.isNameValid(providedName)) {
+        while (!InputHandler.isNameValid(providedName)) {
             System.out.print("  Nome inválido! Tente novamente: ");
             providedName = SC.nextLine();
         }
@@ -52,7 +52,7 @@ public class UserInterface {
     public static Pet.PetType collectPetType() {
         System.out.print("2 - Qual o tipo do pet (Cachorro/Gato)? ");
         String providedType = SC.nextLine();
-        while (!Validator.isTypeValid(providedType)) {
+        while (!InputHandler.isTypeValid(providedType)) {
             System.out.print("  Tipo inválido! Tente novamente: ");
             providedType = SC.nextLine();
         }
@@ -67,11 +67,11 @@ public class UserInterface {
     public static Pet.PetSex collectPetSex() {
         System.out.print("3 - Qual o sexo do pet (Macho/Fêmea)? ");
         String providedSex = SC.nextLine();
-        while (!Validator.isSexValid(providedSex)) {
+        while (!InputHandler.isSexValid(providedSex)) {
             System.out.print("  Sexo inválido! Tente novamente: ");
             providedSex = SC.nextLine();
         }
-        String sex = Validator.normalizeText(providedSex);
+        String sex = InputHandler.normalizeText(providedSex);
         if (sex.trim().equalsIgnoreCase(Pet.PetSex.MACHO.sex))
             return Pet.PetSex.MACHO;
         if (sex.trim().equalsIgnoreCase(Pet.PetSex.FEMEA.sex))
@@ -93,7 +93,7 @@ public class UserInterface {
     public static int collectPetAge() {
         System.out.print("5 - Qual a idade aproximada do pet (anos)? ");
         String providedAge = SC.nextLine();
-        while (!Validator.isAgeValid(providedAge)) {
+        while (!InputHandler.isAgeValid(providedAge)) {
             System.out.print("  Idade inválida! Tente novamente: ");
             providedAge = SC.nextLine();
         }
@@ -103,7 +103,7 @@ public class UserInterface {
     public static double collectPetWeight() {
         System.out.print("6 - Qual o peso aproximado do pet (kg)? ");
         String providedWeight = SC.nextLine();
-        while (!Validator.isWeightValid(providedWeight)) {
+        while (!InputHandler.isWeightValid(providedWeight)) {
             System.out.print("  Peso inválido! Tente novamente: ");
             providedWeight = SC.nextLine();
         }
@@ -113,7 +113,7 @@ public class UserInterface {
     public static String collectPetRace() {
         System.out.print("7 - Qual a raça do pet? ");
         String providedRace = SC.nextLine();
-        while (!Validator.isNameValid(providedRace)) {
+        while (!InputHandler.isNameValid(providedRace)) {
             System.out.print("  Nome de raça inválido! Tente novamente: ");
             providedRace = SC.nextLine();
         }
@@ -141,7 +141,7 @@ public class UserInterface {
         System.out.println();
         System.out.print("Deseja procurar por algum critério em específico (Sim/Não)? ");
         String answer = SC.nextLine();
-        while (!Validator.isAnswerValid(answer)) {
+        while (!InputHandler.isAnswerValid(answer)) {
             System.out.print("Resposta inválida! Tente novamente: ");
             answer = SC.nextLine();
         }
@@ -152,7 +152,7 @@ public class UserInterface {
         System.out.println();
         System.out.print("Digite o ID do pet que deseja deletar: ");
         String petId = SC.nextLine();
-        while (!Validator.isInteger(petId)) {
+        while (!InputHandler.isInteger(petId)) {
             System.out.print("ID inválido! Tente novamente: ");
             petId = SC.nextLine();
         }
@@ -163,7 +163,7 @@ public class UserInterface {
         System.out.println();
         System.out.print("Tem certeza que deseja apagar o cadastro do pet selecionado (Sim/Não)? ");
         String answer = SC.nextLine();
-        while (!Validator.isAnswerValid(answer)) {
+        while (!InputHandler.isAnswerValid(answer)) {
             System.out.print("Resposta inválida! Tente novamente: ");
             answer = SC.nextLine();
         }
@@ -192,7 +192,7 @@ public class UserInterface {
 
     public static int readCriteria() {
         String criteria = SC.nextLine();
-        while (!Validator.isChoiceValid(criteria)) {
+        while (!InputHandler.isChoiceValid(criteria)) {
             System.out.print("Critério inválido! Tente novamente: ");
             criteria = SC.nextLine();
         }
@@ -207,7 +207,7 @@ public class UserInterface {
     public static String askSexToSearchFor() {
         System.out.print("Sexo a ser procurado (MACHO/FEMEA): ");
         String providedSex = SC.nextLine();
-        while (!Validator.isSexValid(providedSex)) {
+        while (!InputHandler.isSexValid(providedSex)) {
             System.out.print("Sexo inválido! Tente novamente: ");
             providedSex = SC.nextLine();
         }
@@ -217,7 +217,7 @@ public class UserInterface {
     public static String askAgeToSearchFor() {
         System.out.print("Idade a ser procurada: ");
         String providedAge = SC.nextLine();
-        while (!Validator.isAgeValid(providedAge)) {
+        while (!InputHandler.isAgeValid(providedAge)) {
             System.out.print("Idade inválida! Tente novamente: ");
             providedAge = SC.nextLine();
         }
@@ -227,7 +227,7 @@ public class UserInterface {
     public static String askWeightToSearchFor() {
         System.out.print("Peso a ser procurada: ");
         String providedWeight = SC.nextLine();
-        while (!Validator.isWeightValid(providedWeight)) {
+        while (!InputHandler.isWeightValid(providedWeight)) {
             System.out.print("Peso inválido! Tente novamente: ");
             providedWeight = SC.nextLine();
         }
@@ -237,7 +237,7 @@ public class UserInterface {
     public static String askRaceToSearchFor() {
         System.out.print("Nome de raça a ser procurado: ");
         String providedRace = SC.nextLine();
-        while (!Validator.isNameValid(providedRace)) {
+        while (!InputHandler.isNameValid(providedRace)) {
             System.out.print("Nome de raça inválido! Tente novamente: ");
             providedRace = SC.nextLine();
         }
@@ -273,7 +273,7 @@ public class UserInterface {
         System.out.println();
         System.out.print("Deseja continuar usando o sistema (Sim/Não)? ");
         String answer = SC.nextLine();
-        while (!Validator.isAnswerValid(answer)) {
+        while (!InputHandler.isAnswerValid(answer)) {
             System.out.print("Resposta inválida! Tente novamente: ");
             answer = SC.nextLine();
         }

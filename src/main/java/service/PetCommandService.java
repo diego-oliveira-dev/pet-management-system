@@ -6,7 +6,7 @@ import repository.PetCommandRepository;
 import view.UserInterface;
 
 @Log4j2
-public class PetService {
+public class PetCommandService {
     public static void save() {
         Pet pet = Pet.builder()
                 .name(UserInterface.collectPetName())

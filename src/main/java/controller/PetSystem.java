@@ -1,7 +1,7 @@
 package controller;
 
 import service.PetFinderService;
-import service.PetService;
+import service.PetCommandService;
 import view.UserInterface;
 
 public class PetSystem {
@@ -15,11 +15,11 @@ public class PetSystem {
     public void handleRequest(int choice) {
         switch (choice) {
             case 1:
-                PetService.save();
+                PetCommandService.save();
                 checkSystemUsage();
                 break;
             case 3:
-                PetService.delete();
+                PetCommandService.delete();
                 checkSystemUsage();
                 break;
             case 4:

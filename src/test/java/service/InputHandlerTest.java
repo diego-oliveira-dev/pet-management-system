@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-class ValidatorTest {
+class InputHandlerTest {
 
     @Test
     @DisplayName("The pipeline should return a String array that contains only numbers or sequences of it")
