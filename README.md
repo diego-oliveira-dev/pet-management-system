@@ -1,38 +1,46 @@
 # Sistema de Cadastro de Pets
 
-## Descrição
+Sistema de cadastro de pets desenvolvido em Java com JDBC e MySQL, com foco em prática de arquitetura em camadas, manipulação de banco de dados relacional e organização de responsabilidades no backend.
 
-Esse projeto é um sistema de cadastros via CLI, onde o usuário pode cadastrar novos pets, alterar dados e apagar o registro de um pet existente.
-O projeto também conta com um sistema de pesquisa, onde o usuário pode solicitar uma listagem de pets cadastrados com ou sem critérios exigidos pelo próprio usuário.
+## Funcionalidades
 
-## Funcionalidades atuais
+* Cadastro de pets
+* Atualização de dados cadastrados
+* Remoção de pets
+* Listagem de todos os pets
+* Busca por critérios:
 
-Atualmente, o sistema conta com as seguintes funcionalidades:
-* Cadastro de novos pets com base no input dos usuários e com validação
-* Alteração de dados de pets já cadastrados anteriormente
-* Remoção de pets cadastrados
-* Listagem de todos os pets cadastrados
-* Listagem de pets cadastrados com base em algum critério
+  * nome
+  * sexo
+  * idade
+  * peso
+  * raça
+  * endereço
 
-## Objetivo do projeto
+## Tecnologias utilizadas
 
-Este projeto foi desenvolvido para reforçar conceitos fundamentais de programação orientada a objetos e praticar a construção de aplicações Java estruturadas em múltiplas camadas.
+* Java 21
+* JDBC
+* MySQL
+* Maven
+* Lombok
+* Log4j2
+* JUnit
 
-Durante o desenvolvimento, foram trabalhados conceitos como:
+## Arquitetura
 
-- modelagem de entidades e encapsulamento;
-- separação de responsabilidades entre classes;
-- manipulação de arquivos;
-- validação de dados;
-- uso de Collections;
-- lambdas e programação funcional básica;
-- organização modular do código;
-- tratamento de exceções;
-- noções iniciais de persistência de dados.
+O projeto foi estruturado utilizando separação em camadas, organizando responsabilidades entre:
 
-## Próximos passos
+* controller
+* service
+* repository
+* domain
+* view
 
-Esse projeto ainda está em desenvolvimento. Planejo revisitá-lo futuramente para:
-* Refatoração de certos componentes para melhorar legibilidade, escalabilidade e aplicação de boas práticas
-* Reforçar a validação do input dos usuários, que em alguns casos está ausente ou frágil
-* Implementar funcionalidade de listar pets cadastrados com base em dois critérios (caso o usuário deseje)
+## Melhorias futuras
+
+* API REST com Spring Boot
+* Hibernate / JPA
+* Injeção de dependência
+* Docker
+* Testes automatizados mais completos
