@@ -151,7 +151,7 @@ public class PetFinderRepository {
     public static PreparedStatement createPreparedStatementToFindByAddress(Connection c, String petAddress) throws SQLException {
         String sql = "SELECT p.id, p.name, p.type, p.sex, p.address, p.age, p.weight, p.race\n" +
                 "FROM pets p\n" +
-                "WHERE race like ?;";
+                "WHERE address like ?;";
         PreparedStatement ps = c.prepareStatement(sql);
         ps.setString(1, String.format("%%%s%%", petAddress));
         return ps;
