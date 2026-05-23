@@ -1,0 +1,51 @@
+package controller;
+
+import service.PetFinderService;
+import service.PetCommandService;
+import view.UserInterface;
+
+public class PetSystem {
+
+    public void start() {
+        UserInterface.showMainMenu();
+        int choice = UserInterface.readChoice();
+        handleRequest(choice);
+    }
+
+    public void handleRequest(int choice) {
+        switch (choice) {
+            case 1:
+                PetCommandService.save();
+                checkSystemUsage();
+                break;
+            case 2:
+                PetCommandService.update();
+                checkSystemUsage();
+                break;
+            case 3:
+                PetCommandService.delete();
+                checkSystemUsage();
+                break;
+            case 4:
+                PetFinderService.findAll();
+                checkSystemUsage();
+                break;
+            case 5:
+                PetFinderService.findByCriteria();
+                checkSystemUsage();
+                break;
+            case 6:
+                shutDown();
+                break;
+        }
+    }
+
+    public void checkSystemUsage() {
+        if (UserInterface.checkSystemUsage()) start();
+        else shutDown();
+    }
+
+    public void shutDown() {
+        UserInterface.shuttingDown();
+    }
+}
