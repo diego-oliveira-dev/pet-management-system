@@ -18,6 +18,10 @@ public class PetSystem {
                 PetCommandService.save();
                 checkSystemUsage();
                 break;
+            case 2:
+                PetCommandService.update();
+                checkSystemUsage();
+                break;
             case 3:
                 PetCommandService.delete();
                 checkSystemUsage();

@@ -9,13 +9,15 @@ import java.util.regex.Pattern;
 @Log4j2
 public class InputHandler {
     public static boolean isChoiceValid(String input) {
-        int choice;
-        try {
-            choice = Integer.parseInt(input);
-        } catch (Exception e) {
-            return false;
-        }
+        if (!isInteger(input)) return false;
+        int choice = Integer.parseInt(input);
         return choice >= 1 && choice <= 6;
+    }
+
+    public static boolean isInfoChoiceValid(String infoChoice) {
+        if (!isInteger(infoChoice)) return false;
+        int choice = Integer.parseInt(infoChoice);
+        return choice >= 1 && choice <= 5;
     }
 
     public static boolean isNameValid(String providedName) {
@@ -36,15 +38,6 @@ public class InputHandler {
                 || sex.trim().equalsIgnoreCase("femea");
     }
 
-    public static boolean isInteger(String providedAge) {
-        try {
-            Integer.parseInt(providedAge);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
     public static boolean isAgeValid(String providedAge) {
         if (!isInteger(providedAge)) return false;
         int age = Integer.parseInt(providedAge);
@@ -52,12 +45,8 @@ public class InputHandler {
     }
 
     public static boolean isWeightValid(String providedWeight) {
-        double weight;
-        try {
-            weight = Double.parseDouble(providedWeight);
-        } catch (Exception e) {
-            return false;
-        }
+        if (!isDouble(providedWeight)) return false;
+        double weight = Double.parseDouble(providedWeight);
         return weight > 0 && weight <= 20;
     }
 
@@ -65,6 +54,24 @@ public class InputHandler {
         String answer = normalizeText(providedAnswer);
         return answer.trim().equalsIgnoreCase("sim")
                 || answer.trim().equalsIgnoreCase("nao");
+    }
+
+    public static boolean isInteger(String input) {
+        try {
+            Integer.parseInt(input);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isDouble(String input) {
+        try {
+            Double.parseDouble(input);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     public static String normalizeText(String input) {
