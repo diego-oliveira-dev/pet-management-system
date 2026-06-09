@@ -11,6 +11,7 @@ public class PetCreator {
 
     public static Pet createValidPet() {
         return Pet.builder()
+                .id(1L)
                 .name("Zaya")
                 .build();
     }
