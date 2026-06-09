@@ -1,15 +1,18 @@
 package com.projetos.diego.pet_management_system.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.exception.BadRequestException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
+import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.service.PetService;
 import com.projetos.diego.pet_management_system.util.PetCreator;
+import com.projetos.diego.pet_management_system.util.PetPostRequestBodyCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,6 +25,9 @@ class PetControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @MockitoBean
     private PetService petService;
@@ -66,5 +72,21 @@ class PetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
                         .value("Resource Not Found Exception"));
+    }
+
+    @Test
+    @DisplayName("save returns 200 when successful")
+    void save_Returns200_WhenSuccessful() throws Exception {
+        Pet pet = PetCreator.createPetToBeSaved();
+        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+
+        Mockito.when(petService.save(petPostRequestBody)).thenReturn(pet);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(petPostRequestBody)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                        .value(pet.getId()));
     }
 }

@@ -1,13 +1,12 @@
 package com.projetos.diego.pet_management_system.controller;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.service.PetService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +24,10 @@ public class PetController {
     @GetMapping("/{id}")
     public ResponseEntity<Pet> findById(@PathVariable long id) {
         return ResponseEntity.ok(petService.findByIdOrThrowResourceNotFoundException(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequestBody petPostRequestBody) {
+        return ResponseEntity.ok(petService.save(petPostRequestBody));
     }
 }
