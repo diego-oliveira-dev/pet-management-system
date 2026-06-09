@@ -24,6 +24,6 @@ public class PetController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Pet> findById(@PathVariable long id) {
-        return ResponseEntity.ok(petService.findByIdOrThrowBadRequestException(id));
+        return ResponseEntity.ok(petService.findByIdOrThrowResourceNotFoundException(id));
     }
 }

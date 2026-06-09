@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.exception.BadRequestException;
+import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,8 @@ public class PetService {
         return petRepository.findAll();
     }
 
-    public Pet findByIdOrThrowBadRequestException(long id) {
+    public Pet findByIdOrThrowResourceNotFoundException(long id) {
         return petRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Pet not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
     }
 }
