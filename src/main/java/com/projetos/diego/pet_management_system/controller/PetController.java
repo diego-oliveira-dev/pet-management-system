@@ -26,6 +26,11 @@ public class PetController {
         return ResponseEntity.ok(petService.findByIdOrThrowResourceNotFoundException(id));
     }
 
+    @GetMapping("/find")
+    public ResponseEntity<List<Pet>> findByName(@RequestParam String name) {
+        return ResponseEntity.ok(petService.findByName(name));
+    }
+
     @PostMapping
     public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequestBody petPostRequestBody) {
         return ResponseEntity.ok(petService.save(petPostRequestBody));

@@ -27,7 +27,7 @@ class PetControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper mapper;
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private PetService petService;
@@ -75,6 +75,20 @@ class PetControllerTest {
     }
 
     @Test
+    @DisplayName("findByName returns 200 when successful")
+    void findByName_Returns200_WhenSuccessful() throws Exception {
+        Pet pet = PetCreator.createValidPet();
+
+        Mockito.when(petService.findByName(pet.getName()))
+                .thenReturn(List.of(pet));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/find?name={name}", pet.getName()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name")
+                        .value(pet.getName()));
+    }
+
+    @Test
     @DisplayName("save returns 200 when successful")
     void save_Returns200_WhenSuccessful() throws Exception {
         Pet pet = PetCreator.createPetToBeSaved();
@@ -83,8 +97,9 @@ class PetControllerTest {
         Mockito.when(petService.save(petPostRequestBody)).thenReturn(pet);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(petPostRequestBody)))
+                        .content(objectMapper.writeValueAsString(petPostRequestBody)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
                         .value(pet.getId()));

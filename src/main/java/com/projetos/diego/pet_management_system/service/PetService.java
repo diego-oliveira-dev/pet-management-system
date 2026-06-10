@@ -23,6 +23,10 @@ public class PetService {
                 .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
     }
 
+    public List<Pet> findByName(String name) {
+        return petRepository.findByName(name);
+    }
+
     public Pet save(PetPostRequestBody petPostRequestBody) {
         Pet pet = Pet.builder().name(petPostRequestBody.getName()).build();
         return petRepository.save(pet);
