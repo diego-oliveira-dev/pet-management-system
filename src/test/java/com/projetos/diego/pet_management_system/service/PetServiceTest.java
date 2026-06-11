@@ -104,4 +104,34 @@ class PetServiceTest {
                 .isThrownBy(() -> this.petService.replace(invalidPetPutRequestBody))
                 .withMessageContaining("Pet not found");
     }
+
+    @Test
+    @DisplayName("delete removes the pet when successful")
+    void delete_RemovesThePet_WhenSuccessful() {
+        Pet alreadySavedPet = PetCreator.createValidPet();
+        Long id = alreadySavedPet.getId();
+
+        BDDMockito.when(petRepositoryMock.findById(id))
+                .thenReturn(Optional.of(alreadySavedPet));
+
+        petService.delete(id);
+
+        Mockito.verify(petRepositoryMock, Mockito.times(1)).delete(alreadySavedPet);
+    }
+
+    @Test
+    @DisplayName("delete throws ResourceNotFoundException when pet is not found")
+    void delete_ThrowsResourceNotFoundException_WhenPetIsNotFound() {
+        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.empty());
+
+        Pet pet = PetCreator.createValidPet();
+        Long id = pet.getId();
+
+        Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
+                .isThrownBy(() -> this.petService.delete(id))
+                .withMessageContaining("Pet not found");
+
+        Mockito.verify(petRepositoryMock, Mockito.never()).delete(ArgumentMatchers.any(Pet.class));
+    }
 }

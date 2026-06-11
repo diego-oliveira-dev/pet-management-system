@@ -33,9 +33,14 @@ public class PetService {
         return petRepository.save(pet);
     }
 
-    public Pet replace(PetPutRequestBody petPutRequestBody) {
+    public void replace(PetPutRequestBody petPutRequestBody) {
         Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequestBody.getId());
         Pet petToBeUpdated = Pet.builder().id(alreadySavedPet.getId()).name(petPutRequestBody.getName()).build();
-        return petRepository.save(petToBeUpdated);
+        petRepository.save(petToBeUpdated);
+    }
+
+    public void delete(long id) {
+        Pet petToBeDeleted = findByIdOrThrowResourceNotFoundException(id);
+        petRepository.delete(petToBeDeleted);
     }
 }

@@ -35,12 +35,18 @@ public class PetController {
 
     @PostMapping
     public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequestBody petPostRequestBody) {
-        return new ResponseEntity<>(petService.save(petPostRequestBody), HttpStatus.CREATED); // 201
+        return new ResponseEntity<>(petService.save(petPostRequestBody), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequestBody petPutRequestBody) {
         petService.replace(petPutRequestBody);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable @Valid long id) {
+        petService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

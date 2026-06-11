@@ -11,6 +11,8 @@ import com.projetos.diego.pet_management_system.util.PetPostRequestBodyCreator;
 import com.projetos.diego.pet_management_system.util.PetPutRequestBodyCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -123,12 +125,37 @@ class PetControllerTest {
     void replace_Returns404_WhenPetIsNotFound() throws Exception {
         PetPutRequestBody petPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
 
-        Mockito.when(petServiceMock.replace(petPutRequestBody))
-                .thenThrow(new ResourceNotFoundException("Pet not found"));
+        BDDMockito.willThrow(new ResourceNotFoundException("Pet not found"))
+                .given(petServiceMock)
+                .replace(petPutRequestBody);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequestBody)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("delete returns 204 when successful")
+    void delete_Returns204_WhenSuccessful() throws Exception {
+        Long id = PetCreator.createValidPet().getId();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", id))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        Mockito.verify(petServiceMock, Mockito.times(1)).delete(id);
+    }
+
+    @Test
+    @DisplayName("delete returns 404 when pet is not found")
+    void delete_Returns404_WhenPetIsNotFound() throws Exception {
+        Long id = PetCreator.createValidPet().getId();
+
+        BDDMockito.willThrow(new ResourceNotFoundException("Pet not found"))
+                .given(petServiceMock)
+                .delete(ArgumentMatchers.anyLong());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }
