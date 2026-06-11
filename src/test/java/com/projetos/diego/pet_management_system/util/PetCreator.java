@@ -15,4 +15,11 @@ public class PetCreator {
                 .name("Zaya")
                 .build();
     }
+
+    public static Pet createPetToBeUpdated() {
+        return Pet.builder()
+                .id(1L)
+                .name("Rex")
+                .build();
+    }
 }

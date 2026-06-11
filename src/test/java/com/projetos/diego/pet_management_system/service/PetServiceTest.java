@@ -3,15 +3,14 @@ package com.projetos.diego.pet_management_system.service;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
+import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.util.PetCreator;
+import com.projetos.diego.pet_management_system.util.PetPutRequestBodyCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -71,5 +70,38 @@ class PetServiceTest {
         List<Pet> pets = petService.findByName("random test name");
 
         Assertions.assertThat(pets).isNotNull().isEmpty();
+    }
+
+    @Test
+    @DisplayName("replace updates the pet when successful")
+    void replace_UpdatesThePet_WhenSuccessful() {
+        Pet alreadySavedPet = PetCreator.createValidPet();
+        BDDMockito.when(petRepositoryMock.findById(alreadySavedPet.getId()))
+                .thenReturn(Optional.of(alreadySavedPet));
+        BDDMockito.when(petRepositoryMock.save(ArgumentMatchers.any(Pet.class)))
+                .thenAnswer(argument -> argument.getArgument(0));
+
+        PetPutRequestBody petPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
+        petService.replace(petPutRequestBody);
+
+        ArgumentCaptor<Pet> petCaptor = ArgumentCaptor.forClass(Pet.class);
+        Mockito.verify(petRepositoryMock).save(petCaptor.capture());
+        Pet capturedPet = petCaptor.getValue();
+
+        Assertions.assertThat(capturedPet.getId()).isEqualTo(alreadySavedPet.getId());
+        Assertions.assertThat(capturedPet.getName()).isEqualTo(petPutRequestBody.getName());
+    }
+
+    @Test
+    @DisplayName("replace throws ResourceNotFoundException when pet is not found")
+    void replace_ThrowsResourceNotFoundException_WhenPetIsNotFound() {
+        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.empty());
+
+        PetPutRequestBody invalidPetPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
+
+        Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
+                .isThrownBy(() -> this.petService.replace(invalidPetPutRequestBody))
+                .withMessageContaining("Pet not found");
     }
 }

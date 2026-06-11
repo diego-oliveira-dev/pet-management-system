@@ -4,6 +4,7 @@ import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
 import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
+import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,11 @@ public class PetService {
     public Pet save(PetPostRequestBody petPostRequestBody) {
         Pet pet = Pet.builder().name(petPostRequestBody.getName()).build();
         return petRepository.save(pet);
+    }
+
+    public Pet replace(PetPutRequestBody petPutRequestBody) {
+        Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequestBody.getId());
+        Pet petToBeUpdated = Pet.builder().id(alreadySavedPet.getId()).name(petPutRequestBody.getName()).build();
+        return petRepository.save(petToBeUpdated);
     }
 }

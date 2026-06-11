@@ -2,9 +2,11 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
+import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,12 @@ public class PetController {
 
     @PostMapping
     public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequestBody petPostRequestBody) {
-        return ResponseEntity.ok(petService.save(petPostRequestBody));
+        return new ResponseEntity<>(petService.save(petPostRequestBody), HttpStatus.CREATED); // 201
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequestBody petPutRequestBody) {
+        petService.replace(petPutRequestBody);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204
     }
 }
