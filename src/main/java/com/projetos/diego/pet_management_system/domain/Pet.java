@@ -1,14 +1,12 @@
 package com.projetos.diego.pet_management_system.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -20,6 +18,37 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Sex sex;
+
+    @Column(name = "birth_date", nullable = false)
+    private LocalDate birthDate;
+
+    @Column(name = "weight_kg", nullable = false, precision = 5)
+    private Double weight;
+
+    private String breed;
+
+    private String address;
+
+    @Column(nullable = false)
+    private String owner;
+
+    public enum Type {
+        DOG,
+        CAT
+    }
+
+    public enum Sex {
+        MALE,
+        FEMALE
+    }
 }

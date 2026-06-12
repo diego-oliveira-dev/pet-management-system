@@ -1,4 +1,4 @@
-package com.projetos.diego.pet_management_system.exception;
+package com.projetos.diego.pet_management_system.exception.details;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

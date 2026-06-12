@@ -7,6 +7,7 @@ import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetService {
     private final PetRepository petRepository;
+    private final AddressLookupService addressLookupService;
 
     public List<Pet> listAll() {
         return petRepository.findAll();
@@ -28,8 +30,19 @@ public class PetService {
         return petRepository.findByName(name);
     }
 
+    @Transactional
     public Pet save(PetPostRequestBody petPostRequestBody) {
-        Pet pet = Pet.builder().name(petPostRequestBody.getName()).build();
+        String address = addressLookupService.findByPostalCode(petPostRequestBody.getPostalCode());
+        Pet pet = Pet.builder()
+                .name(petPostRequestBody.getName())
+                .type(petPostRequestBody.getType())
+                .sex(petPostRequestBody.getSex())
+                .birthDate(petPostRequestBody.getBirthDate())
+                .weight(petPostRequestBody.getWeight())
+                .breed(petPostRequestBody.getBreed())
+                .address(address)
+                .owner(petPostRequestBody.getOwner())
+                .build();
         return petRepository.save(pet);
     }
 

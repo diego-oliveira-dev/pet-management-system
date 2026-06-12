@@ -1,9 +1,9 @@
 package com.projetos.diego.pet_management_system.handler;
 
 import com.projetos.diego.pet_management_system.exception.BadRequestException;
-import com.projetos.diego.pet_management_system.exception.BadRequestExceptionDetails;
+import com.projetos.diego.pet_management_system.exception.details.BadRequestExceptionDetails;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
-import com.projetos.diego.pet_management_system.exception.ResourceNotFoundExceptionDetails;
+import com.projetos.diego.pet_management_system.exception.details.ResourceNotFoundExceptionDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
