@@ -1,7 +1,6 @@
-package com.projetos.diego.pet_management_system.client;
+package com.projetos.diego.pet_management_system.client.viacep;
 
 import com.projetos.diego.pet_management_system.exception.PostalCodeNotFoundException;
-import com.projetos.diego.pet_management_system.responses.ViaCepResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;

@@ -1,7 +1,6 @@
-package com.projetos.diego.pet_management_system.service;
+package com.projetos.diego.pet_management_system.client.viacep;
 
-import com.projetos.diego.pet_management_system.client.ViaCepClient;
-import com.projetos.diego.pet_management_system.responses.ViaCepResponse;
+import com.projetos.diego.pet_management_system.service.AddressLookupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

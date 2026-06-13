@@ -1,8 +1,12 @@
 package com.projetos.diego.pet_management_system.handler;
 
 import com.projetos.diego.pet_management_system.exception.BadRequestException;
-import com.projetos.diego.pet_management_system.exception.details.BadRequestExceptionDetails;
+import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
+import com.projetos.diego.pet_management_system.exception.PostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
+import com.projetos.diego.pet_management_system.exception.details.BadRequestExceptionDetails;
+import com.projetos.diego.pet_management_system.exception.details.InvalidPostalCodeExceptionDetails;
+import com.projetos.diego.pet_management_system.exception.details.PostalCodeNotFoundExceptionDetails;
 import com.projetos.diego.pet_management_system.exception.details.ResourceNotFoundExceptionDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +32,20 @@ public class RestExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InvalidPostalCodeException.class)
+    public ResponseEntity<InvalidPostalCodeExceptionDetails> handleInvalidPostalCodeException
+            (InvalidPostalCodeException invalidPostalCodeException) {
+        return new ResponseEntity<>(
+                InvalidPostalCodeExceptionDetails.builder()
+                        .title("Invalid Postal Code Exception")
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .details(invalidPostalCodeException.getMessage())
+                        .developerMessage(invalidPostalCodeException.getClass().getName())
+                        .timestamp(LocalDateTime.now())
+                        .build(), HttpStatus.BAD_REQUEST
+        );
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResourceNotFoundExceptionDetails> handleResourceNotFoundException
             (ResourceNotFoundException resourceNotFoundException) {
@@ -37,6 +55,20 @@ public class RestExceptionHandler {
                         .status(HttpStatus.NOT_FOUND.value())
                         .details(resourceNotFoundException.getMessage())
                         .developerMessage(resourceNotFoundException.getClass().getName())
+                        .timestamp(LocalDateTime.now())
+                        .build(), HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(PostalCodeNotFoundException.class)
+    public ResponseEntity<PostalCodeNotFoundExceptionDetails> handlePostalCodeNotFoundException
+            (PostalCodeNotFoundException postalCodeNotFoundException) {
+        return new ResponseEntity<>(
+                PostalCodeNotFoundExceptionDetails.builder()
+                        .title("Postal Code Not Found Exception")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .details(postalCodeNotFoundException.getMessage())
+                        .developerMessage(postalCodeNotFoundException.getClass().getName())
                         .timestamp(LocalDateTime.now())
                         .build(), HttpStatus.NOT_FOUND
         );
