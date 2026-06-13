@@ -1,4 +1,4 @@
-package com.projetos.diego.pet_management_system.client.viacep;
+package com.projetos.diego.pet_management_system.client;
 
 import com.projetos.diego.pet_management_system.exception.PostalCodeNotFoundException;
 import lombok.RequiredArgsConstructor;

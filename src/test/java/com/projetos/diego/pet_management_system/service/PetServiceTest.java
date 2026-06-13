@@ -3,8 +3,10 @@ package com.projetos.diego.pet_management_system.service;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
+import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.util.PetCreator;
+import com.projetos.diego.pet_management_system.util.PetPostRequestBodyCreator;
 import com.projetos.diego.pet_management_system.util.PetPutRequestBodyCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +25,73 @@ class PetServiceTest {
 
     @Mock
     private PetRepository petRepositoryMock;
+
+    @Mock
+    private AddressLookupService addressLookupServiceMock;
+
+    @Test
+    @DisplayName("save persists pet when successful")
+    void save_PersistsPet_WhenSuccessful() {
+        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        Pet pet = PetCreator.createPetToBeSaved();
+
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
+                .thenReturn(PetCreator.createValidAddress());
+        BDDMockito.when(petRepositoryMock.save(pet)).thenReturn(pet);
+
+        Pet savedPet = petService.save(petPostRequestBody);
+
+        Assertions.assertThat(savedPet).isNotNull();
+        Assertions.assertThat(savedPet).isEqualTo(pet);
+    }
+
+    @Test
+    @DisplayName("save persists pet when only required fields are provided")
+    void save_PersistsPet_WhenOnlyRequiredFieldsAreProvided() {
+        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBodyWithOnlyRequiredFields();
+        Pet pet = PetCreator.createPetToBeSavedWithOnlyRequiredFields();
+
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
+                .thenReturn(null);
+        BDDMockito.when(petRepositoryMock.save(pet)).thenReturn(pet);
+
+        Pet savedPet = petService.save(petPostRequestBody);
+
+        Assertions.assertThat(savedPet).isNotNull();
+        Assertions.assertThat(savedPet).isEqualTo(pet);
+    }
+
+    @Test
+    @DisplayName("save does not persists pet when postal code is not found")
+    void save_DoesNotPersistsPet_WhenPostalCodeIsNotFound() {
+        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        petPostRequestBody.setPostalCode("99999999");
+
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
+                .thenThrow(new RuntimeException("Postal code not found"));
+
+        Assertions.assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> this.petService.save(petPostRequestBody))
+                .withMessageContaining("Postal code not found");
+
+        Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
+    }
+
+    @Test
+    @DisplayName("save does not persists pet when postal code is invalid")
+    void save_DoesNotPersistsPet_WhenPostalCodeIsInvalid() {
+        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        petPostRequestBody.setPostalCode("99   9999999");
+
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
+                .thenThrow(new RuntimeException("Invalid postal code format"));
+
+        Assertions.assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> this.petService.save(petPostRequestBody))
+                .withMessageContaining("Invalid postal code format");
+
+        Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
+    }
 
     @Test
     @DisplayName("findByIdOrThrowResourceNotFoundException returns pet when successful")

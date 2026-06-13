@@ -1,6 +1,8 @@
-package com.projetos.diego.pet_management_system.client.viacep;
+package com.projetos.diego.pet_management_system.service;
 
-import com.projetos.diego.pet_management_system.service.AddressLookupService;
+import com.projetos.diego.pet_management_system.client.ViaCepClient;
+import com.projetos.diego.pet_management_system.client.ViaCepResponse;
+import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,9 @@ public class ViaCepAddressLookupService implements AddressLookupService {
     public String findByPostalCode(String postalCode) {
         if (postalCode == null) {
             return null;
+        }
+        if (postalCode.matches("^\\d{8}$")) {
+            throw new InvalidPostalCodeException("Invalid postal code format");
         }
         ViaCepResponse viaCepResponse = viaCepClient.findByPostalCode(postalCode);
 
