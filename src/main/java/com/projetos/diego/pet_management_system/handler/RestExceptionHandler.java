@@ -1,10 +1,7 @@
 package com.projetos.diego.pet_management_system.handler;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
-import com.projetos.diego.pet_management_system.exception.PostalCodeNotFoundException;
-import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
-import com.projetos.diego.pet_management_system.exception.ViaCepUnavailableException;
+import com.projetos.diego.pet_management_system.exception.*;
 import com.projetos.diego.pet_management_system.exception.details.ExceptionDetails;
 import com.projetos.diego.pet_management_system.exception.details.FieldValidationExceptionDetails;
 import com.projetos.diego.pet_management_system.exception.details.ValidationError;
@@ -23,7 +20,6 @@ import java.util.List;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
-    // create one for field validation
 
     private ExceptionDetails createExceptionDetails(Exception exception, String title, HttpStatus status) {
         return ExceptionDetails.builder()
@@ -72,8 +68,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(exceptionDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(PostalCodeNotFoundException.class)
-    public ResponseEntity<ExceptionDetails> handlePostalCodeNotFound(PostalCodeNotFoundException exception) {
+    @ExceptionHandler(ViaCepPostalCodeNotFoundException.class)
+    public ResponseEntity<ExceptionDetails> handlePostalCodeNotFound(ViaCepPostalCodeNotFoundException exception) {
         ExceptionDetails exceptionDetails = createExceptionDetails(
                 exception,
                 "Postal Code Not Found",
@@ -100,6 +96,16 @@ public class RestExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR);
 
         return new ResponseEntity<>(exceptionDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ViaCepMalformedDataException.class)
+    public ResponseEntity<ExceptionDetails> handleViaCepMalformedData(ViaCepMalformedDataException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "ViaCEP Bad Gateway",
+                HttpStatus.BAD_GATEWAY);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -13,14 +13,11 @@ public class ViaCepAddressLookupService implements AddressLookupService {
 
     @Override
     public String findByPostalCode(String postalCode) {
-        if (postalCode == null) {
-            return null;
-        }
+        if (postalCode == null) return null;
         if (!postalCode.matches("^\\d{8}$")) {
             throw new InvalidPostalCodeException("Invalid postal code format");
         }
         ViaCepResponse response = viaCepClient.findByPostalCode(postalCode);
-
         return String.format("%s, %s, %s - %s",
                 response.getLogradouro(),
                 response.getBairro(),
