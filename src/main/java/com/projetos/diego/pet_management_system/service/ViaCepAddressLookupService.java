@@ -18,11 +18,12 @@ public class ViaCepAddressLookupService implements AddressLookupService {
             throw new InvalidPostalCodeException("Invalid postal code format");
         }
         ViaCepResponse response = viaCepClient.findByPostalCode(postalCode);
-        return String.format("%s, %s, %s - %s",
+        return String.format("%s, %s, %s - %s, %s",
                 response.getLogradouro(),
                 response.getBairro(),
                 response.getLocalidade(),
-                response.getUf().toUpperCase()
+                response.getUf().toUpperCase(),
+                response.getCep()
         );
     }
 }

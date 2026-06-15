@@ -3,7 +3,7 @@ package com.projetos.diego.pet_management_system.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
-import com.projetos.diego.pet_management_system.exception.PostalCodeNotFoundException;
+import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
@@ -77,7 +77,7 @@ class PetControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Resource Not Found Exception"));
+                        .value("Resource Not Found"));
     }
 
     @Test
@@ -116,7 +116,7 @@ class PetControllerTest {
     void save_Returns404_WhenPostalCodeIsNotFound() throws Exception {
         PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
         Mockito.when(petServiceMock.save(petPostRequestBody))
-                .thenThrow(new PostalCodeNotFoundException("Postal code not found"));
+                .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class PetControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Postal Code Not Found Exception"));
+                        .value("Postal Code Not Found"));
     }
 
     @Test
@@ -140,7 +140,7 @@ class PetControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Invalid Postal Code Exception"));
+                        .value("Invalid Postal Code Format"));
     }
 
     @Test
