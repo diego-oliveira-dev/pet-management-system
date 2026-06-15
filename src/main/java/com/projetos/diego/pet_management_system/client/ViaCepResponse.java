@@ -1,8 +1,10 @@
 package com.projetos.diego.pet_management_system.client;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class ViaCepResponse {
     private String cep;
     private String logradouro;

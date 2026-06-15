@@ -16,18 +16,16 @@ public class ViaCepAddressLookupService implements AddressLookupService {
         if (postalCode == null) {
             return null;
         }
-        if (postalCode.matches("^\\d{8}$")) {
+        if (!postalCode.matches("^\\d{8}$")) {
             throw new InvalidPostalCodeException("Invalid postal code format");
         }
-        ViaCepResponse viaCepResponse = viaCepClient.findByPostalCode(postalCode);
+        ViaCepResponse response = viaCepClient.findByPostalCode(postalCode);
 
-        String street = viaCepResponse.getLogradouro();
-        String neighbourhood = viaCepResponse.getBairro();
-        String city = viaCepResponse.getLocalidade();
-        String state = viaCepResponse.getUf();
-
-        String address = String.format("%s, %s, %s - %s", street, neighbourhood, city, state.toUpperCase());
-
-        return address;
+        return String.format("%s, %s, %s - %s",
+                response.getLogradouro(),
+                response.getBairro(),
+                response.getLocalidade(),
+                response.getUf().toUpperCase()
+        );
     }
 }

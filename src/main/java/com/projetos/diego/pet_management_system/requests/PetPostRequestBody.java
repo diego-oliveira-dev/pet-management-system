@@ -30,8 +30,8 @@ public class PetPostRequestBody {
     private LocalDate birthDate;
 
     @NotNull(message = "Pet weight cannot be empty")
-    @DecimalMin(value = "0.5")
-    @DecimalMax(value = "150.0")
+    @DecimalMin(value = "0.5", message = "Pet weight must be greater than or equal to 0.5")
+    @DecimalMax(value = "150.0", message = "Pet weight must be less than or equal to 150.0")
     private Double weight;
 
     @Pattern(regexp = "^$|\\s*\\S+.*", message = "Field must not be empty or blank")

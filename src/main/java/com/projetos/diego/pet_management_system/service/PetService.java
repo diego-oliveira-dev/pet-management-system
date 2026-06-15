@@ -23,7 +23,7 @@ public class PetService {
 
     public Pet findByIdOrThrowResourceNotFoundException(long id) {
         return petRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pet was not found"));
     }
 
     public List<Pet> findByName(String name) {
