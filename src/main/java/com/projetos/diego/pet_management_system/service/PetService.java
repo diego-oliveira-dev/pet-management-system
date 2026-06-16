@@ -6,6 +6,8 @@ import com.projetos.diego.pet_management_system.repository.PetRepository;
 import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +19,11 @@ public class PetService {
     private final PetRepository petRepository;
     private final AddressLookupService addressLookupService;
 
-    public List<Pet> listAll() {
+    public Page<Pet> listAll(Pageable pageable) {
+        return petRepository.findAll(pageable);
+    }
+
+    public List<Pet> listAllNonPageable() {
         return petRepository.findAll();
     }
 

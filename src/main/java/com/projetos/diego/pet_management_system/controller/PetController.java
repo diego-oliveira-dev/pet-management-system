@@ -6,6 +6,8 @@ import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,13 @@ public class PetController {
     private final PetService petService;
 
     @GetMapping
-    public ResponseEntity<List<Pet>> list() {
-        return ResponseEntity.ok(petService.listAll());
+    public ResponseEntity<Page<Pet>> list(Pageable pageable) {
+        return ResponseEntity.ok(petService.listAll(pageable));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Pet>> listAll() {
+        return ResponseEntity.ok(petService.listAllNonPageable());
     }
 
     @GetMapping("/{id}")

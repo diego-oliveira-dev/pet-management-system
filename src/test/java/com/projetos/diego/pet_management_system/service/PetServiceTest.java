@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,81 @@ class PetServiceTest {
 
     @Mock
     private AddressLookupService addressLookupServiceMock;
+
+    @Test
+    @DisplayName("listAll returns list of pets inside page when successful")
+    void listAll_ReturnsListOfPetsInsidePage_WhenSuccessful() {
+        PageImpl<Pet> petPage = new PageImpl<>(List.of(PetCreator.createValidPet()));
+        PageRequest pageable = PageRequest.of(0, 3);
+        BDDMockito.when(petRepositoryMock.findAll(pageable))
+                .thenReturn(petPage);
+
+        Page<Pet> returnedPetPage = petService.listAll(pageable);
+
+        Assertions.assertThat(returnedPetPage).isNotNull().isNotEmpty().isEqualTo(petPage);
+        Mockito.verify(petRepositoryMock, Mockito.times(1)).findAll(pageable);
+    }
+
+    @Test
+    @DisplayName("listAllNonPageable returns list of pets when successful")
+    void listAllNonPageable_ReturnsListOfPets_WhenSuccessful() {
+        List<Pet> petList = List.of(PetCreator.createValidPet());
+        BDDMockito.when(petRepositoryMock.findAll())
+                .thenReturn(petList);
+
+        List<Pet> returnedPetList = petService.listAllNonPageable();
+
+        Assertions.assertThat(returnedPetList).isNotNull().isNotEmpty().isEqualTo(petList);
+        Mockito.verify(petRepositoryMock, Mockito.times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("findByIdOrThrowResourceNotFoundException returns pet when successful")
+    void findByIdOrThrowResourceNotFoundException_ReturnsPet_WhenSuccessful() {
+        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(PetCreator.createValidPet()));
+
+        Long expectedId = PetCreator.createValidPet().getId();
+        Pet pet = petService.findByIdOrThrowResourceNotFoundException(3L);
+
+        Assertions.assertThat(pet).isNotNull();
+        Assertions.assertThat(pet.getId()).isEqualTo(expectedId);
+    }
+
+    @Test
+    @DisplayName("findByIdOrThrowResourceNotFoundException throws ResourceNotFoundException when pet is not found")
+    void findByIdOrThrowResourceNotFoundException_ThrowsResourceNotFoundException_WhenPetIsNotFound() {
+        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
+                .isThrownBy(() -> this.petService.findByIdOrThrowResourceNotFoundException(3L))
+                .withMessageContaining("Pet not found");
+    }
+
+    @Test
+    @DisplayName("findByName returns list of pets when successful")
+    void findByName_ReturnsListOfPets_WhenSuccessful() {
+        BDDMockito.when(petRepositoryMock.findByName(ArgumentMatchers.anyString()))
+                .thenReturn(List.of(PetCreator.createValidPet()));
+
+        Pet petThatWeAreLookingFor = PetCreator.createValidPet();
+        List<Pet> pets = petService.findByName(petThatWeAreLookingFor.getName());
+
+        Assertions.assertThat(pets).isNotNull().hasSize(1);
+        Assertions.assertThat(pets.getFirst().getId()).isEqualTo(petThatWeAreLookingFor.getId());
+    }
+
+    @Test
+    @DisplayName("findByName returns empty list when pet is not found")
+    void findByName_ReturnsEmptyList_WhenNoPetIsFound() {
+        BDDMockito.when(petRepositoryMock.findByName(ArgumentMatchers.anyString()))
+                .thenReturn(List.of());
+
+        List<Pet> pets = petService.findByName("random test name");
+
+        Assertions.assertThat(pets).isNotNull().isEmpty();
+    }
 
     @Test
     @DisplayName("save persists pet when successful")
@@ -91,54 +169,6 @@ class PetServiceTest {
                 .withMessageContaining("Invalid postal code format");
 
         Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
-    }
-
-    @Test
-    @DisplayName("findByIdOrThrowResourceNotFoundException returns pet when successful")
-    void findByIdOrThrowResourceNotFoundException_ReturnsPet_WhenSuccessful() {
-        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.of(PetCreator.createValidPet()));
-
-        Long expectedId = PetCreator.createValidPet().getId();
-        Pet pet = petService.findByIdOrThrowResourceNotFoundException(3L);
-
-        Assertions.assertThat(pet).isNotNull();
-        Assertions.assertThat(pet.getId()).isEqualTo(expectedId);
-    }
-
-    @Test
-    @DisplayName("findByIdOrThrowResourceNotFoundException throws ResourceNotFoundException when pet is not found")
-    void findByIdOrThrowResourceNotFoundException_ThrowsResourceNotFoundException_WhenPetIsNotFound() {
-        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.empty());
-
-        Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> this.petService.findByIdOrThrowResourceNotFoundException(3L))
-                .withMessageContaining("Pet not found");
-    }
-
-    @Test
-    @DisplayName("findByName returns list of pets when successful")
-    void findByName_ReturnsListOfPets_WhenSuccessful() {
-        BDDMockito.when(petRepositoryMock.findByName(ArgumentMatchers.anyString()))
-                .thenReturn(List.of(PetCreator.createValidPet()));
-
-        Pet petThatWeAreLookingFor = PetCreator.createValidPet();
-        List<Pet> pets = petService.findByName(petThatWeAreLookingFor.getName());
-
-        Assertions.assertThat(pets).isNotNull().hasSize(1);
-        Assertions.assertThat(pets.getFirst().getId()).isEqualTo(petThatWeAreLookingFor.getId());
-    }
-
-    @Test
-    @DisplayName("findByName returns empty list when pet is not found")
-    void findByName_ReturnsEmptyList_WhenNoPetIsFound() {
-        BDDMockito.when(petRepositoryMock.findByName(ArgumentMatchers.anyString()))
-                .thenReturn(List.of());
-
-        List<Pet> pets = petService.findByName("random test name");
-
-        Assertions.assertThat(pets).isNotNull().isEmpty();
     }
 
     @Test

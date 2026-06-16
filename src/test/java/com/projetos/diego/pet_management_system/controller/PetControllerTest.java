@@ -3,8 +3,8 @@ package com.projetos.diego.pet_management_system.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
-import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
+import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.service.PetService;
@@ -18,6 +18,8 @@ import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,17 +41,51 @@ class PetControllerTest {
     private PetService petServiceMock;
 
     @Test
-    @DisplayName("list returns 200 when successful")
-    void list_Returns200_WhenSuccessful() throws Exception {
+    @DisplayName("listAll returns 200 when successful")
+    void listAll_Returns200_WhenSuccessful() throws Exception {
 
         List<Pet> pets = List.of(PetCreator.createValidPet());
 
-        Mockito.when(petServiceMock.listAll()).thenReturn(pets);
+        Mockito.when(petServiceMock.listAllNonPageable()).thenReturn(pets);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/all"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name")
                         .value(pets.getFirst().getName()));
+    }
+
+    @Test
+    @DisplayName("list returns 200 when successful")
+    void list_Returns200_WhenSuccessful() throws Exception {
+        PageImpl<Pet> petPage = new PageImpl<>(List.of(PetCreator.createValidPet()));
+
+        Mockito.when(petServiceMock.listAll(ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(petPage);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.page.totalElements")
+                        .value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.page.size")
+                        .value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].name")
+                        .value(petPage.getContent().getFirst().getName()));
+    }
+
+    @Test
+    @DisplayName("list returns 200 and empty page when no pet exists")
+    void list_Returns200AndEmptyPage_WhenNoPetExists() throws Exception {
+        PageImpl<Pet> petPage = new PageImpl<>(List.of());
+
+        Mockito.when(petServiceMock.listAll(ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(petPage);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.page.totalElements")
+                        .value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.page.size")
+                        .value(0));
     }
 
     @Test
