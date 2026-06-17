@@ -48,7 +48,7 @@ public class PetPostRequestBody {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private Double weight;
 
-    @Pattern(regexp = "^$|\\s*\\S+.*", message = "Field must not be empty or blank")
+    @Pattern(regexp = ".*\\S+.*", message = "Must not be empty or blank")
     @Schema(description = "This is the breed of the pet.",
             example = "Golden Retriever",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
@@ -56,14 +56,14 @@ public class PetPostRequestBody {
     private String breed;
 
     @Pattern(regexp = "^\\d{8}$", message = "Postal code must be exactly 8 digits long")
-    @Pattern(regexp = "^$|\\s*\\S+.*", message = "Field must not be empty or blank")
+    @Pattern(regexp = ".*\\S+.*", message = "Must not be empty or blank")
     @Schema(description = "This is the postal code of the owner. Must be exactly 8 digits long without empty spaces",
             example = "64009100",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
             nullable = true)
     private String postalCode;
 
-    @NotBlank(message = "Pet owner cannot be empty")
+    @NotBlank(message = "Pet owner cannot be empty or blank")
     @Pattern(regexp = "^$|\\s*\\S+.*", message = "Field must not be empty or blank")
     @Schema(description = "This is the pet's owner name.",
             example = "Diego Oliveira",

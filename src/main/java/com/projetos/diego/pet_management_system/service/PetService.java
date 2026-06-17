@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ public class PetService {
         return petRepository.findByName(name);
     }
 
-    @Transactional
     public Pet save(PetPostRequestBody petPostRequestBody) {
         String address = addressLookupService.findByPostalCode(petPostRequestBody.getPostalCode());
         Pet pet = Pet.builder()
@@ -54,7 +52,18 @@ public class PetService {
 
     public void replace(PetPutRequestBody petPutRequestBody) {
         Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequestBody.getId());
-        Pet petToBeUpdated = Pet.builder().id(alreadySavedPet.getId()).name(petPutRequestBody.getName()).build();
+        String address = addressLookupService.findByPostalCode(petPutRequestBody.getPostalCode());
+        Pet petToBeUpdated = Pet.builder()
+                .id(alreadySavedPet.getId())
+                .name(petPutRequestBody.getName())
+                .type(petPutRequestBody.getType())
+                .sex(petPutRequestBody.getSex())
+                .birthDate(petPutRequestBody.getBirthDate())
+                .weight(petPutRequestBody.getWeight())
+                .breed(petPutRequestBody.getBreed())
+                .address(address)
+                .owner(petPutRequestBody.getOwner())
+                .build();
         petRepository.save(petToBeUpdated);
     }
 
