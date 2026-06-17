@@ -9,8 +9,6 @@ import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.service.PetService;
 import com.projetos.diego.pet_management_system.util.PetCreator;
-import com.projetos.diego.pet_management_system.util.PetPostRequestBodyCreator;
-import com.projetos.diego.pet_management_system.util.PetPutRequestBodyCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -134,7 +132,7 @@ class PetControllerTest {
     @DisplayName("save returns 201 when successful")
     void save_Returns201_WhenSuccessful() throws Exception {
         Pet pet = PetCreator.createPetToBeSaved();
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
 
         Mockito.when(petServiceMock.save(petPostRequestBody)).thenReturn(pet);
 
@@ -148,9 +146,39 @@ class PetControllerTest {
     }
 
     @Test
+    @DisplayName("save returns 400 when weight is negative")
+    void save_Returns400_WhenWeightIsNegative() throws Exception {
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
+        petPostRequestBody.setWeight(-32.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(petPostRequestBody))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Validation Failed"));
+    }
+
+    @Test
+    @DisplayName("save returns 400 when name is blank")
+    void save_Returns400_WhenNameIsBlank() throws Exception {
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
+        petPostRequestBody.setName("");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(petPostRequestBody))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Validation Failed"));
+    }
+
+    @Test
     @DisplayName("save returns 404 when postal code is not found")
     void save_Returns404_WhenPostalCodeIsNotFound() throws Exception {
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
         Mockito.when(petServiceMock.save(petPostRequestBody))
                 .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
 
@@ -165,8 +193,8 @@ class PetControllerTest {
 
     @Test
     @DisplayName("save returns 400 when postal code is invalid")
-    void save_Returns400_WhenPostalCodeIsNotFound() throws Exception {
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+    void save_Returns400_WhenPostalCodeIsInvalid() throws Exception {
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
         Mockito.when(petServiceMock.save(petPostRequestBody))
                 .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
 
@@ -182,7 +210,7 @@ class PetControllerTest {
     @Test
     @DisplayName("replace returns 204 when successful")
     void replace_Returns204_WhenSuccessful() throws Exception {
-        PetPutRequestBody petPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -191,10 +219,23 @@ class PetControllerTest {
     }
 
     @Test
+    @DisplayName("replace returns 400 when ID is null")
+    void replace_Returns400_WhenIdIsNull() throws Exception {
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
+        petPutRequestBody.setId(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(petPutRequestBody)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Validation Failed"));
+    }
+
+    @Test
     @DisplayName("replace returns 404 when pet is not found")
     void replace_Returns404_WhenPetIsNotFound() throws Exception {
-        PetPutRequestBody petPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
-
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
         BDDMockito.willThrow(new ResourceNotFoundException("Pet not found"))
                 .given(petServiceMock)
                 .replace(petPutRequestBody);
@@ -203,6 +244,38 @@ class PetControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequestBody)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("replace returns 404 when postal code is not found")
+    void replace_Returns404_WhenPostalCodeIsNotFound() throws Exception {
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
+        BDDMockito.willThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"))
+                .given(petServiceMock)
+                .replace(petPutRequestBody);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(petPutRequestBody)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Postal Code Not Found"));
+    }
+
+    @Test
+    @DisplayName("replace returns 400 when postal code is invalid")
+    void replace_Returns400_WhenPostalCodeIsInvalid() throws Exception {
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
+        BDDMockito.willThrow(new InvalidPostalCodeException("Invalid postal code format"))
+                .given(petServiceMock)
+                .replace(petPutRequestBody);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(petPutRequestBody)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Invalid Postal Code Format"));
     }
 
     @Test
