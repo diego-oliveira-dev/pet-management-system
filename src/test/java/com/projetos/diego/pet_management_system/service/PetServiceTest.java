@@ -1,13 +1,13 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
+import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
 import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
 import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import com.projetos.diego.pet_management_system.util.PetCreator;
-import com.projetos.diego.pet_management_system.util.PetPostRequestBodyCreator;
-import com.projetos.diego.pet_management_system.util.PetPutRequestBodyCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -110,9 +110,8 @@ class PetServiceTest {
     @Test
     @DisplayName("save persists pet when successful")
     void save_PersistsPet_WhenSuccessful() {
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
         Pet pet = PetCreator.createPetToBeSaved();
-
         BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
                 .thenReturn(PetCreator.createValidAddress());
         BDDMockito.when(petRepositoryMock.save(pet)).thenReturn(pet);
@@ -126,7 +125,7 @@ class PetServiceTest {
     @Test
     @DisplayName("save persists pet when only required fields are provided")
     void save_PersistsPet_WhenOnlyRequiredFieldsAreProvided() {
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBodyWithOnlyRequiredFields();
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBodyWithOnlyRequiredFields();
         Pet pet = PetCreator.createPetToBeSavedWithOnlyRequiredFields();
 
         BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
@@ -142,13 +141,13 @@ class PetServiceTest {
     @Test
     @DisplayName("save does not persists pet when postal code is not found")
     void save_DoesNotPersistsPet_WhenPostalCodeIsNotFound() {
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
         petPostRequestBody.setPostalCode("99999999");
 
         BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
                 .thenThrow(new RuntimeException("Postal code not found"));
 
-        Assertions.assertThatExceptionOfType(RuntimeException.class)
+        Assertions.assertThatExceptionOfType(ViaCepPostalCodeNotFoundException.class)
                 .isThrownBy(() -> this.petService.save(petPostRequestBody))
                 .withMessageContaining("Postal code not found");
 
@@ -158,13 +157,13 @@ class PetServiceTest {
     @Test
     @DisplayName("save does not persists pet when postal code is invalid")
     void save_DoesNotPersistsPet_WhenPostalCodeIsInvalid() {
-        PetPostRequestBody petPostRequestBody = PetPostRequestBodyCreator.createPetPostRequestBody();
+        PetPostRequestBody petPostRequestBody = PetCreator.createPetPostRequestBody();
         petPostRequestBody.setPostalCode("99   9999999");
 
         BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPostRequestBody.getPostalCode()))
                 .thenThrow(new RuntimeException("Invalid postal code format"));
 
-        Assertions.assertThatExceptionOfType(RuntimeException.class)
+        Assertions.assertThatExceptionOfType(InvalidPostalCodeException.class)
                 .isThrownBy(() -> this.petService.save(petPostRequestBody))
                 .withMessageContaining("Invalid postal code format");
 
@@ -175,20 +174,32 @@ class PetServiceTest {
     @DisplayName("replace updates the pet when successful")
     void replace_UpdatesThePet_WhenSuccessful() {
         Pet alreadySavedPet = PetCreator.createValidPet();
+        String address = PetCreator.createValidAddress();
         BDDMockito.when(petRepositoryMock.findById(alreadySavedPet.getId()))
                 .thenReturn(Optional.of(alreadySavedPet));
-        BDDMockito.when(petRepositoryMock.save(ArgumentMatchers.any(Pet.class)))
-                .thenAnswer(argument -> argument.getArgument(0));
-
-        PetPutRequestBody petPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
-        petService.replace(petPutRequestBody);
-
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(ArgumentMatchers.anyString()))
+                .thenReturn(address);
         ArgumentCaptor<Pet> petCaptor = ArgumentCaptor.forClass(Pet.class);
+
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
+        petService.replace(petPutRequestBody);
         Mockito.verify(petRepositoryMock).save(petCaptor.capture());
         Pet capturedPet = petCaptor.getValue();
+        Pet expectedPet = Pet.builder()
+                .id(alreadySavedPet.getId())
+                .name(petPutRequestBody.getName())
+                .type(petPutRequestBody.getType())
+                .sex(petPutRequestBody.getSex())
+                .birthDate(petPutRequestBody.getBirthDate())
+                .weight(petPutRequestBody.getWeight())
+                .breed(petPutRequestBody.getBreed())
+                .address(address)
+                .owner(petPutRequestBody.getOwner())
+                .build();
 
-        Assertions.assertThat(capturedPet.getId()).isEqualTo(alreadySavedPet.getId());
-        Assertions.assertThat(capturedPet.getName()).isEqualTo(petPutRequestBody.getName());
+        Mockito.verify(addressLookupServiceMock)
+                .findByPostalCode(petPutRequestBody.getPostalCode());
+        Assertions.assertThat(capturedPet).isNotNull().isEqualTo(expectedPet);
     }
 
     @Test
@@ -197,11 +208,45 @@ class PetServiceTest {
         BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Optional.empty());
 
-        PetPutRequestBody invalidPetPutRequestBody = PetPutRequestBodyCreator.createPetPutRequestBody();
+        PetPutRequestBody invalidPetPutRequestBody = PetCreator.createPetPutRequestBody();
 
         Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> this.petService.replace(invalidPetPutRequestBody))
                 .withMessageContaining("Pet not found");
+    }
+
+    @Test
+    @DisplayName("replace does not updates pet when postal code is not found")
+    void replace_DoesNotUpdatesPet_WhenPostalCodeIsNotFound() {
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
+        petPutRequestBody.setPostalCode("99999999");
+        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(PetCreator.createValidPet()));
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPutRequestBody.getPostalCode()))
+                .thenThrow(new RuntimeException("Postal code not found"));
+
+        Assertions.assertThatExceptionOfType(ViaCepPostalCodeNotFoundException.class)
+                .isThrownBy(() -> this.petService.replace(petPutRequestBody))
+                .withMessageContaining("Postal code not found");
+
+        Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
+    }
+
+    @Test
+    @DisplayName("replace throws InvalidPostalCodeException when postal code is invalid")
+    void replace_ThrowsInvalidPostalCodeException_WhenPostalCodeIsInvalid() {
+        PetPutRequestBody petPutRequestBody = PetCreator.createPetPutRequestBody();
+        petPutRequestBody.setPostalCode("99   9999999");
+        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(PetCreator.createValidPet()));
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPutRequestBody.getPostalCode()))
+                .thenThrow(new RuntimeException("Invalid postal code format"));
+
+        Assertions.assertThatExceptionOfType(InvalidPostalCodeException.class)
+                .isThrownBy(() -> this.petService.replace(petPutRequestBody))
+                .withMessageContaining("Invalid postal code format");
+
+        Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
     }
 
     @Test
