@@ -32,7 +32,7 @@ public class PetService {
     }
 
     public List<Pet> findByName(String name) {
-        return petRepository.findByName(name);
+        return petRepository.findByNameContaining(name);
     }
 
     public Pet save(PetPostRequestBody petPostRequestBody) {

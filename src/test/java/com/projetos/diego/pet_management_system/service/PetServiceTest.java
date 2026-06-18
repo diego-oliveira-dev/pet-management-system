@@ -86,7 +86,7 @@ class PetServiceTest {
     @Test
     @DisplayName("findByName returns list of pets when successful")
     void findByName_ReturnsListOfPets_WhenSuccessful() {
-        BDDMockito.when(petRepositoryMock.findByName(ArgumentMatchers.anyString()))
+        BDDMockito.when(petRepositoryMock.findByNameContaining(ArgumentMatchers.anyString()))
                 .thenReturn(List.of(PetCreator.createValidPet()));
 
         Pet petThatWeAreLookingFor = PetCreator.createValidPet();
@@ -99,7 +99,7 @@ class PetServiceTest {
     @Test
     @DisplayName("findByName returns empty list when pet is not found")
     void findByName_ReturnsEmptyList_WhenNoPetIsFound() {
-        BDDMockito.when(petRepositoryMock.findByName(ArgumentMatchers.anyString()))
+        BDDMockito.when(petRepositoryMock.findByNameContaining(ArgumentMatchers.anyString()))
                 .thenReturn(List.of());
 
         List<Pet> pets = petService.findByName("random test name");
