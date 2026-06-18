@@ -1,14 +1,12 @@
 package com.projetos.diego.pet_management_system.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -39,8 +37,9 @@ public class Pet {
 
     private String address;
 
-    @Column(nullable = false)
-    private String owner;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private PetOwner petOwner;
 
     public enum Type {
         DOG,
