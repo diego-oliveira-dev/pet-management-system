@@ -1,8 +1,8 @@
 package com.projetos.diego.pet_management_system.controller;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
-import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
+import com.projetos.diego.pet_management_system.dto.PetPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -80,8 +80,8 @@ public class PetController {
             @ApiResponse(responseCode = "502", description = "Address lookup service did not function correctly")
     })
     @PostMapping
-    public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequestBody petPostRequestBody) {
-        return new ResponseEntity<>(petService.save(petPostRequestBody), HttpStatus.CREATED);
+    public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequest petPostRequest) {
+        return new ResponseEntity<>(petService.save(petPostRequest), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Replaces a pet",
@@ -91,8 +91,8 @@ public class PetController {
             @ApiResponse(responseCode = "404", description = "Pet does not exist in the database")
     })
     @PutMapping
-    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequestBody petPutRequestBody) {
-        petService.replace(petPutRequestBody);
+    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequest petPutRequest) {
+        petService.replace(petPutRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

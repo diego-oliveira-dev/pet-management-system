@@ -1,7 +1,8 @@
-package com.projetos.diego.pet_management_system.requests;
+package com.projetos.diego.pet_management_system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.PetOwner;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Builder
-public class PetPutRequestBody {
+public class PetPutRequest {
     @NotNull(message = "Pet id cannot be null")
     @Schema(description = "This is the ID of the pet",
             example = "42",
@@ -70,5 +71,5 @@ public class PetPutRequestBody {
     @Schema(description = "This is the pet's owner name.",
             example = "Diego Oliveira",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private String owner;
+    private PetOwner owner;
 }

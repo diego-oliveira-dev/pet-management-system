@@ -1,7 +1,8 @@
-package com.projetos.diego.pet_management_system.requests;
+package com.projetos.diego.pet_management_system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.PetOwner;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 @Builder
-public class PetPostRequestBody {
+public class PetPostRequest {
     @NotBlank(message = "Pet name cannot be empty or blank")
     @Schema(description = "This is the name of the pet.",
             example = "Rex",
@@ -68,5 +69,5 @@ public class PetPostRequestBody {
     @Schema(description = "This is the pet's owner name.",
             example = "Diego Oliveira",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private String owner;
+    private PetOwner owner;
 }

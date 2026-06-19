@@ -1,8 +1,8 @@
 package com.projetos.diego.pet_management_system.util;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
-import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
+import com.projetos.diego.pet_management_system.dto.PetPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 
 import java.time.LocalDate;
 
@@ -41,8 +41,8 @@ public class PetCreator {
         return "Rua José Marques da Rocha, Memorare, Teresina - PI, 64009-100";
     }
 
-    public static PetPostRequestBody createPetPostRequestBody() {
-        return PetPostRequestBody.builder()
+    public static PetPostRequest createPetPostRequestBody() {
+        return PetPostRequest.builder()
                 .name("Zaya")
                 .type(Pet.Type.DOG)
                 .sex(Pet.Sex.FEMALE)
@@ -54,8 +54,8 @@ public class PetCreator {
                 .build();
     }
 
-    public static PetPostRequestBody createPetPostRequestBodyWithOnlyRequiredFields() {
-        return PetPostRequestBody.builder()
+    public static PetPostRequest createPetPostRequestBodyWithOnlyRequiredFields() {
+        return PetPostRequest.builder()
                 .name("Zaya")
                 .type(Pet.Type.DOG)
                 .sex(Pet.Sex.FEMALE)
@@ -67,8 +67,8 @@ public class PetCreator {
                 .build();
     }
 
-    public static PetPutRequestBody createPetPutRequestBody() {
-        return PetPutRequestBody.builder()
+    public static PetPutRequest createPetPutRequestBody() {
+        return PetPutRequest.builder()
                 .id(1L)
                 .name("Zaya")
                 .type(Pet.Type.DOG)
