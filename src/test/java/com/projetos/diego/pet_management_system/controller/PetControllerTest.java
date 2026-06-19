@@ -7,6 +7,7 @@ import com.projetos.diego.pet_management_system.exception.ResourceNotFoundExcept
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
+import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.service.PetService;
 import com.projetos.diego.pet_management_system.util.PetCreator;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,9 @@ class PetControllerTest {
 
     @MockitoBean
     private PetService petServiceMock;
+
+    @MockitoBean
+    private PetMapper petMapperMock;
 
     @Test
     @DisplayName("listAll returns 200 when successful")

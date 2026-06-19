@@ -4,6 +4,8 @@ import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
+import com.projetos.diego.pet_management_system.mapper.PetMapper;
+import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
@@ -28,6 +30,12 @@ class PetServiceTest {
 
     @Mock
     private PetRepository petRepositoryMock;
+
+    @Mock
+    private PetMapper petMapperMock;
+
+    @Mock
+    private PetOwnerRepository petOwnerRepository;
 
     @Mock
     private AddressLookupService addressLookupServiceMock;
@@ -194,7 +202,7 @@ class PetServiceTest {
                 .weight(petPutRequest.getWeight())
                 .breed(petPutRequest.getBreed())
                 .address(address)
-                .owner(petPutRequest.getOwner())
+                .petOwner(petPutRequest.getPetOwner())
                 .build();
 
         Mockito.verify(addressLookupServiceMock)

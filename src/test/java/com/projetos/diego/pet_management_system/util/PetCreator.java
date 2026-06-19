@@ -1,10 +1,12 @@
 package com.projetos.diego.pet_management_system.util;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class PetCreator {
     public static Pet createPetToBeSaved() {
@@ -33,7 +35,7 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .address(createValidAddress())
-                .owner("Diego Oliveira")
+                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
                 .build();
     }
 
@@ -50,7 +52,7 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .postalCode("64009100")
-                .owner("Diego Oliveira")
+                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
                 .build();
     }
 
@@ -63,7 +65,7 @@ public class PetCreator {
                 .weight(20.0)
                 .breed(null)
                 .postalCode(null)
-                .owner("Diego Oliveira")
+                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
                 .build();
     }
 
@@ -77,7 +79,7 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .postalCode("64009100")
-                .owner("Diego Oliveira")
+                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
                 .build();
     }
 }

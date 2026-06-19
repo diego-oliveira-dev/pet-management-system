@@ -64,10 +64,9 @@ public class PetPostRequest {
             nullable = true)
     private String postalCode;
 
-    @NotBlank(message = "Pet owner name cannot be empty or blank")
-    @Pattern(regexp = "^$|\\s*\\S+.*", message = "Field must not be empty or blank")
+    @NotNull(message = "Pet owner ID cannot be null")
     @Schema(description = "This is the pet's owner name.",
             example = "Diego Oliveira",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private PetOwner owner;
+    private Long ownerId;
 }

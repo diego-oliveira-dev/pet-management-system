@@ -1,6 +1,7 @@
 package com.projetos.diego.pet_management_system.mapper;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.dto.PetResponse;
@@ -22,7 +23,7 @@ public class PetMapper {
                 .build();
     }
 
-    public Pet fromPostRequestToEntity(PetPostRequest petPostRequest, String address) {
+    public Pet fromPostRequestToEntity(PetPostRequest petPostRequest, String address, PetOwner petOwner) {
         return Pet.builder()
                 .name(petPostRequest.getName())
                 .type(petPostRequest.getType())
@@ -31,11 +32,11 @@ public class PetMapper {
                 .weight(petPostRequest.getWeight())
                 .breed(petPostRequest.getBreed())
                 .address(address)
-                .petOwner(petPostRequest.getOwner())
+                .petOwner(petOwner)
                 .build();
     }
 
-    public Pet fromPutRequestToEntity(PetPutRequest petPutRequest, Long id, String address) {
+    public Pet fromPutRequestToEntity(PetPutRequest petPutRequest, Long id, String address, PetOwner petOwner) {
         return Pet.builder()
                 .id(id)
                 .name(petPutRequest.getName())
@@ -45,7 +46,7 @@ public class PetMapper {
                 .weight(petPutRequest.getWeight())
                 .breed(petPutRequest.getBreed())
                 .address(address)
-                .petOwner(petPutRequest.getOwner())
+                .petOwner(petOwner)
                 .build();
     }
 }

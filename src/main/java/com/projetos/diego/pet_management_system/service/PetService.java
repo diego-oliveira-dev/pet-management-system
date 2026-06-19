@@ -1,10 +1,12 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
+import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetService {
     private final PetRepository petRepository;
+    private final PetOwnerRepository petOwnerRepository;
     private final PetMapper petMapper;
     private final AddressLookupService addressLookupService;
 
@@ -38,15 +41,23 @@ public class PetService {
     }
 
     public Pet save(PetPostRequest petPostRequest) {
+        PetOwner petOwner = petOwnerRepository.findById(petPostRequest.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         String address = addressLookupService.findByPostalCode(petPostRequest.getPostalCode());
-        Pet pet = petMapper.fromPostRequestToEntity(petPostRequest, address);
+        Pet pet = petMapper.fromPostRequestToEntity(petPostRequest, address, petOwner);
         return petRepository.save(pet);
     }
 
     public void replace(PetPutRequest petPutRequest) {
         Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequest.getId());
+        PetOwner petOwner = petOwnerRepository.findById(petPutRequest.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         String address = addressLookupService.findByPostalCode(petPutRequest.getPostalCode());
-        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(petPutRequest, alreadySavedPet.getId(), address);
+        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(
+                petPutRequest,
+                alreadySavedPet.getId(),
+                address,
+                petOwner);
         petRepository.save(petToBeUpdated);
     }
 
