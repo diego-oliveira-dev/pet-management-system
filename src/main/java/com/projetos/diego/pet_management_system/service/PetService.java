@@ -1,10 +1,10 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.dto.PetPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
-import com.projetos.diego.pet_management_system.requests.PetPostRequestBody;
-import com.projetos.diego.pet_management_system.requests.PetPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,34 +35,34 @@ public class PetService {
         return petRepository.findByNameContaining(name);
     }
 
-    public Pet save(PetPostRequestBody petPostRequestBody) {
-        String address = addressLookupService.findByPostalCode(petPostRequestBody.getPostalCode());
+    public Pet save(PetPostRequest petPostRequest) {
+        String address = addressLookupService.findByPostalCode(petPostRequest.getPostalCode());
         Pet pet = Pet.builder()
-                .name(petPostRequestBody.getName())
-                .type(petPostRequestBody.getType())
-                .sex(petPostRequestBody.getSex())
-                .birthDate(petPostRequestBody.getBirthDate())
-                .weight(petPostRequestBody.getWeight())
-                .breed(petPostRequestBody.getBreed())
+                .name(petPostRequest.getName())
+                .type(petPostRequest.getType())
+                .sex(petPostRequest.getSex())
+                .birthDate(petPostRequest.getBirthDate())
+                .weight(petPostRequest.getWeight())
+                .breed(petPostRequest.getBreed())
                 .address(address)
-                .owner(petPostRequestBody.getOwner())
+                .petOwner(petPostRequest.getOwner())
                 .build();
         return petRepository.save(pet);
     }
 
-    public void replace(PetPutRequestBody petPutRequestBody) {
-        Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequestBody.getId());
-        String address = addressLookupService.findByPostalCode(petPutRequestBody.getPostalCode());
+    public void replace(PetPutRequest petPutRequest) {
+        Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequest.getId());
+        String address = addressLookupService.findByPostalCode(petPutRequest.getPostalCode());
         Pet petToBeUpdated = Pet.builder()
                 .id(alreadySavedPet.getId())
-                .name(petPutRequestBody.getName())
-                .type(petPutRequestBody.getType())
-                .sex(petPutRequestBody.getSex())
-                .birthDate(petPutRequestBody.getBirthDate())
-                .weight(petPutRequestBody.getWeight())
-                .breed(petPutRequestBody.getBreed())
+                .name(petPutRequest.getName())
+                .type(petPutRequest.getType())
+                .sex(petPutRequest.getSex())
+                .birthDate(petPutRequest.getBirthDate())
+                .weight(petPutRequest.getWeight())
+                .breed(petPutRequest.getBreed())
                 .address(address)
-                .owner(petPutRequestBody.getOwner())
+                .petOwner(petPutRequest.getOwner())
                 .build();
         petRepository.save(petToBeUpdated);
     }
