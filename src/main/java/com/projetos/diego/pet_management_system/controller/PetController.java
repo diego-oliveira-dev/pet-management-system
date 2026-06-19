@@ -3,6 +3,8 @@ package com.projetos.diego.pet_management_system.controller;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
+import com.projetos.diego.pet_management_system.dto.PetResponse;
+import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetController {
     private final PetService petService;
+    private final PetMapper petMapper;
 
     @Operation(summary = "List all pets with pagination",
             description = "Returns a paginated list of registered pets.")
@@ -31,8 +35,10 @@ public class PetController {
             @ApiResponse(responseCode = "200", description = "All pets were listed with pagination successfully"),
     })
     @GetMapping
-    public ResponseEntity<Page<Pet>> list(@ParameterObject Pageable pageable) {
-        return ResponseEntity.ok(petService.listAll(pageable));
+    public ResponseEntity<Page<PetResponse>> list(@ParameterObject Pageable pageable) {
+        Page<Pet> pets = petService.listAll(pageable);
+        Page<PetResponse> responsePage = pets.map(petMapper::toResponse);
+        return ResponseEntity.ok(responsePage);
     }
 
     @Operation(summary = "List all pets",
@@ -41,8 +47,14 @@ public class PetController {
             @ApiResponse(responseCode = "200", description = "All pets were listed successfully"),
     })
     @GetMapping("/all")
-    public ResponseEntity<List<Pet>> listAll() {
-        return ResponseEntity.ok(petService.listAllNonPageable());
+    public ResponseEntity<List<PetResponse>> listAll() {
+        List<Pet> pets = petService.listAllNonPageable();
+        List<PetResponse> responseList = new ArrayList<>();
+        for (Pet p : pets) {
+            PetResponse response = petMapper.toResponse(p);
+            responseList.add(response);
+        }
+        return ResponseEntity.ok(responseList);
     }
 
     @Operation(summary = "Find a registered pet",
@@ -52,10 +64,12 @@ public class PetController {
             @ApiResponse(responseCode = "404", description = "Pet does not exist in the database"),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Pet> findById(
+    public ResponseEntity<PetResponse> findById(
             @Parameter(name = "id", description = "This is the ID of the pet", example = "42")
             @PathVariable long id) {
-        return ResponseEntity.ok(petService.findByIdOrThrowResourceNotFoundException(id));
+        Pet pet = petService.findByIdOrThrowResourceNotFoundException(id);
+        PetResponse response = petMapper.toResponse(pet);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "List pets with similar names",
@@ -64,10 +78,16 @@ public class PetController {
             @ApiResponse(responseCode = "200", description = "Search was completed successfully, even if pet is not found")
     })
     @GetMapping("/find")
-    public ResponseEntity<List<Pet>> findByName(
+    public ResponseEntity<List<PetResponse>> findByName(
             @Parameter(description = "Pet name used in the search", example = "Rex")
             @RequestParam String name) {
-        return ResponseEntity.ok(petService.findByName(name));
+        List<Pet> pets = petService.findByName(name);
+        List<PetResponse> responseList = new ArrayList<>();
+        for (Pet p : pets) {
+            PetResponse response = petMapper.toResponse(p);
+            responseList.add(response);
+        }
+        return ResponseEntity.ok(responseList);
     }
 
     @Operation(summary = "Create a new pet",
@@ -80,8 +100,10 @@ public class PetController {
             @ApiResponse(responseCode = "502", description = "Address lookup service did not function correctly")
     })
     @PostMapping
-    public ResponseEntity<Pet> save(@RequestBody @Valid PetPostRequest petPostRequest) {
-        return new ResponseEntity<>(petService.save(petPostRequest), HttpStatus.CREATED);
+    public ResponseEntity<PetResponse> save(@RequestBody @Valid PetPostRequest petPostRequest) {
+        Pet savedPet = petService.save(petPostRequest);
+        PetResponse response = petMapper.toResponse(savedPet);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Replaces a pet",

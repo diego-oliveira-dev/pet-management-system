@@ -4,6 +4,7 @@ import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
+import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetService {
     private final PetRepository petRepository;
+    private final PetMapper petMapper;
     private final AddressLookupService addressLookupService;
 
     public Page<Pet> listAll(Pageable pageable) {
@@ -37,33 +39,14 @@ public class PetService {
 
     public Pet save(PetPostRequest petPostRequest) {
         String address = addressLookupService.findByPostalCode(petPostRequest.getPostalCode());
-        Pet pet = Pet.builder()
-                .name(petPostRequest.getName())
-                .type(petPostRequest.getType())
-                .sex(petPostRequest.getSex())
-                .birthDate(petPostRequest.getBirthDate())
-                .weight(petPostRequest.getWeight())
-                .breed(petPostRequest.getBreed())
-                .address(address)
-                .petOwner(petPostRequest.getOwner())
-                .build();
+        Pet pet = petMapper.fromPostRequestToEntity(petPostRequest, address);
         return petRepository.save(pet);
     }
 
     public void replace(PetPutRequest petPutRequest) {
         Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequest.getId());
         String address = addressLookupService.findByPostalCode(petPutRequest.getPostalCode());
-        Pet petToBeUpdated = Pet.builder()
-                .id(alreadySavedPet.getId())
-                .name(petPutRequest.getName())
-                .type(petPutRequest.getType())
-                .sex(petPutRequest.getSex())
-                .birthDate(petPutRequest.getBirthDate())
-                .weight(petPutRequest.getWeight())
-                .breed(petPutRequest.getBreed())
-                .address(address)
-                .petOwner(petPutRequest.getOwner())
-                .build();
+        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(petPutRequest, alreadySavedPet.getId(), address);
         petRepository.save(petToBeUpdated);
     }
 
