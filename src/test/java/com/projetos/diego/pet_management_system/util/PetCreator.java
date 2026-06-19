@@ -9,24 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class PetCreator {
-    public static Pet createPetToBeSaved() {
-        return createGenericPet();
-    }
-
-    public static Pet createPetToBeSavedWithOnlyRequiredFields() {
-        Pet pet = createGenericPet();
-        pet.setBreed(null);
-        pet.setAddress(null);
-        return pet;
-    }
 
     public static Pet createValidPet() {
-        Pet pet = createGenericPet();
-        pet.setId(1L);
-        return pet;
-    }
-
-    public static Pet createGenericPet() {
         return Pet.builder()
                 .name("Zaya")
                 .type(Pet.Type.DOG)
@@ -43,7 +27,7 @@ public class PetCreator {
         return "Rua José Marques da Rocha, Memorare, Teresina - PI, 64009-100";
     }
 
-    public static PetPostRequest createPetPostRequestBody() {
+    public static PetPostRequest createPetPostRequest() {
         return PetPostRequest.builder()
                 .name("Zaya")
                 .type(Pet.Type.DOG)
@@ -52,11 +36,11 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .postalCode("64009100")
-                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
+                .ownerId(1L)
                 .build();
     }
 
-    public static PetPostRequest createPetPostRequestBodyWithOnlyRequiredFields() {
+    public static PetPostRequest createPetPostRequestWithOnlyRequiredFields() {
         return PetPostRequest.builder()
                 .name("Zaya")
                 .type(Pet.Type.DOG)
@@ -65,11 +49,11 @@ public class PetCreator {
                 .weight(20.0)
                 .breed(null)
                 .postalCode(null)
-                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
+                .ownerId(1L)
                 .build();
     }
 
-    public static PetPutRequest createPetPutRequestBody() {
+    public static PetPutRequest createPetPutRequest() {
         return PetPutRequest.builder()
                 .id(1L)
                 .name("Zaya")
@@ -79,7 +63,7 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .postalCode("64009100")
-                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
+                .ownerId(1L)
                 .build();
     }
 }
