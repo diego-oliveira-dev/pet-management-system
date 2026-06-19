@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,11 +48,7 @@ public class PetController {
     @GetMapping("/all")
     public ResponseEntity<List<PetResponse>> listAll() {
         List<Pet> pets = petService.listAllNonPageable();
-        List<PetResponse> responseList = new ArrayList<>();
-        for (Pet p : pets) {
-            PetResponse response = petMapper.toResponse(p);
-            responseList.add(response);
-        }
+        List<PetResponse> responseList = pets.stream().map(petMapper::toResponse).toList();
         return ResponseEntity.ok(responseList);
     }
 
@@ -82,11 +77,7 @@ public class PetController {
             @Parameter(description = "Pet name used in the search", example = "Rex")
             @RequestParam String name) {
         List<Pet> pets = petService.findByName(name);
-        List<PetResponse> responseList = new ArrayList<>();
-        for (Pet p : pets) {
-            PetResponse response = petMapper.toResponse(p);
-            responseList.add(response);
-        }
+        List<PetResponse> responseList = pets.stream().map(petMapper::toResponse).toList();
         return ResponseEntity.ok(responseList);
     }
 
