@@ -24,6 +24,20 @@ public class PetCreator {
                 .build();
     }
 
+    public static Pet createPetToBeUpdated(Pet savedPet) {
+        return Pet.builder()
+                .id(1L)
+                .name("Rex")
+                .type(Pet.Type.DOG)
+                .sex(Pet.Sex.MALE)
+                .birthDate(LocalDate.of(2018, 5, 8))
+                .weight(25.0)
+                .breed("Vira-lata")
+                .address(createValidAddress())
+                .petOwner(savedPet.getPetOwner())
+                .build();
+    }
+
     public static Address createValidAddress() {
         return Address.builder()
                 .street("Rua José Marques da Rocha")
@@ -43,19 +57,6 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .postalCode("64009100")
-                .ownerId(1L)
-                .build();
-    }
-
-    public static PetPostRequest createPetPostRequestWithOnlyRequiredFields() {
-        return PetPostRequest.builder()
-                .name("Zaya")
-                .type(Pet.Type.DOG)
-                .sex(Pet.Sex.FEMALE)
-                .birthDate(LocalDate.of(2020, 12, 8))
-                .weight(20.0)
-                .breed(null)
-                .postalCode(null)
                 .ownerId(1L)
                 .build();
     }
