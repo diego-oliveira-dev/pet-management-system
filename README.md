@@ -73,3 +73,4 @@ Currently working on the implementation of the following features:
 - Owner and pet relationship management
 - Refactoring of PUT DTO to allow for changes in other fields
 - Integration tests
+These changes are currently being developed in the `development-v2` branch.
