@@ -1,5 +1,6 @@
 package com.projetos.diego.pet_management_system.service;
 
+import com.projetos.diego.pet_management_system.domain.Address;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
@@ -40,29 +41,34 @@ public class PetService {
         return petRepository.findByNameContaining(name);
     }
 
-    public Pet save(PetPostRequest petPostRequest) {
-        PetOwner petOwner = petOwnerRepository.findById(petPostRequest.getOwnerId())
+    public Pet save(PetPostRequest request) {
+        PetOwner petOwner = petOwnerRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        String address = addressLookupService.findByPostalCode(petPostRequest.getPostalCode());
-        Pet pet = petMapper.fromPostRequestToEntity(petPostRequest, address, petOwner);
+        Address address = addressLookupService.findByPostalCode(request.getPostalCode());
+        Pet pet = petMapper.fromPostRequestToEntity(request, address, petOwner);
         return petRepository.save(pet);
     }
 
-    public void replace(PetPutRequest petPutRequest) {
-        Pet alreadySavedPet = findByIdOrThrowResourceNotFoundException(petPutRequest.getId());
-        PetOwner petOwner = petOwnerRepository.findById(petPutRequest.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        String address = addressLookupService.findByPostalCode(petPutRequest.getPostalCode());
-        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(
-                petPutRequest,
-                alreadySavedPet.getId(),
-                address,
-                petOwner);
+    public void replace(PetPutRequest request) {
+        Pet savedPet = findByIdOrThrowResourceNotFoundException(request.getId());
+        Address address = resolveAddress(request, savedPet);
+        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(request, savedPet, address);
         petRepository.save(petToBeUpdated);
     }
 
     public void delete(long id) {
         Pet petToBeDeleted = findByIdOrThrowResourceNotFoundException(id);
         petRepository.delete(petToBeDeleted);
+    }
+
+    public boolean postalCodeChanged(PetPutRequest request, Pet savedPet) {
+        return !(request.getPostalCode().equals(savedPet.getAddress().getPostalCode()));
+    }
+
+    public Address resolveAddress(PetPutRequest request, Pet savedPet) {
+        if (postalCodeChanged(request, savedPet)) {
+            return addressLookupService.findByPostalCode(request.getPostalCode());
+        }
+        return savedPet.getAddress();
     }
 }
