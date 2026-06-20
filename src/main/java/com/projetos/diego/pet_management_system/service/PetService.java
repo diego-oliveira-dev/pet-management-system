@@ -5,6 +5,7 @@ import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
+import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
@@ -62,6 +63,9 @@ public class PetService {
     }
 
     public boolean postalCodeChanged(PetPutRequest request, Pet savedPet) {
+        if (request.getPostalCode() == null) {
+            throw new InvalidPostalCodeException("Postal code cannot be null");
+        }
         return !(request.getPostalCode().equals(savedPet.getAddress().getPostalCode()));
     }
 
