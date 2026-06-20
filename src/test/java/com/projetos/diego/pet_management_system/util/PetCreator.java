@@ -1,5 +1,6 @@
 package com.projetos.diego.pet_management_system.util;
 
+import com.projetos.diego.pet_management_system.domain.Address;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
@@ -23,8 +24,14 @@ public class PetCreator {
                 .build();
     }
 
-    public static String createValidAddress() {
-        return "Rua José Marques da Rocha, Memorare, Teresina - PI, 64009-100";
+    public static Address createValidAddress() {
+        return Address.builder()
+                .street("Rua José Marques da Rocha")
+                .neighbourhood("Memorare")
+                .city("Teresina")
+                .state("PI")
+                .postalCode("64009100")
+                .build();
     }
 
     public static PetPostRequest createPetPostRequest() {
@@ -56,11 +63,11 @@ public class PetCreator {
     public static PetPutRequest createPetPutRequest() {
         return PetPutRequest.builder()
                 .id(1L)
-                .name("Zaya")
+                .name("Rex")
                 .type(Pet.Type.DOG)
-                .sex(Pet.Sex.FEMALE)
-                .birthDate(LocalDate.of(2020, 12, 8))
-                .weight(20.0)
+                .sex(Pet.Sex.MALE)
+                .birthDate(LocalDate.of(2018, 5, 8))
+                .weight(25.0)
                 .breed("Vira-lata")
                 .postalCode("64009100")
                 .ownerId(1L)
