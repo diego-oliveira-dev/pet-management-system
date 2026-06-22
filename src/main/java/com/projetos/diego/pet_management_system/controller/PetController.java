@@ -62,9 +62,18 @@ public class PetController {
     public ResponseEntity<PetResponse> findById(
             @Parameter(name = "id", description = "This is the ID of the pet", example = "42")
             @PathVariable long id) {
-        Pet pet = petService.findByIdOrThrowResourceNotFoundException(id);
+        Pet pet = petService.findPetsById(id);
         PetResponse response = petMapper.toResponse(pet);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<PetResponse>> findByOwnerId(
+            @Parameter(name = "ownerId", description = "This is the ID of the pet owner", example = "12")
+            @PathVariable long ownerId) {
+        List<Pet> pets = petService.findPetsByOwnerId(ownerId);
+        List<PetResponse> responseList = pets.stream().map(petMapper::toResponse).toList();
+        return ResponseEntity.ok(responseList);
     }
 
     @Operation(summary = "List pets with similar names",

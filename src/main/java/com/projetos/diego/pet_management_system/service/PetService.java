@@ -33,9 +33,15 @@ public class PetService {
         return petRepository.findAll();
     }
 
-    public Pet findByIdOrThrowResourceNotFoundException(long id) {
+    public Pet findPetsById(long id) {
         return petRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
+    }
+
+    public List<Pet> findPetsByOwnerId(long id) {
+        petOwnerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        return petRepository.findByPetOwnerId(id);
     }
 
     public List<Pet> findByName(String name) {
@@ -51,14 +57,14 @@ public class PetService {
     }
 
     public void replace(PetPutRequest request) {
-        Pet savedPet = findByIdOrThrowResourceNotFoundException(request.getId());
+        Pet savedPet = findPetsById(request.getId());
         Address address = resolveAddress(request, savedPet);
         Pet petToBeUpdated = petMapper.fromPutRequestToEntity(request, savedPet, address);
         petRepository.save(petToBeUpdated);
     }
 
     public void delete(long id) {
-        Pet petToBeDeleted = findByIdOrThrowResourceNotFoundException(id);
+        Pet petToBeDeleted = findPetsById(id);
         petRepository.delete(petToBeDeleted);
     }
 
