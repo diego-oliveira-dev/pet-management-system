@@ -91,8 +91,8 @@ public class PetController {
             @ApiResponse(responseCode = "502", description = "Address lookup service did not function correctly")
     })
     @PostMapping
-    public ResponseEntity<PetResponse> save(@RequestBody @Valid PetPostRequest petPostRequest) {
-        Pet savedPet = petService.save(petPostRequest);
+    public ResponseEntity<PetResponse> save(@RequestBody @Valid PetPostRequest request) {
+        Pet savedPet = petService.save(request);
         PetResponse response = petMapper.toResponse(savedPet);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -104,8 +104,8 @@ public class PetController {
             @ApiResponse(responseCode = "404", description = "Pet does not exist in the database")
     })
     @PutMapping
-    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequest petPutRequest) {
-        petService.replace(petPutRequest);
+    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequest request) {
+        petService.replace(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
