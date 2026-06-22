@@ -1,7 +1,11 @@
 package com.projetos.diego.pet_management_system.service;
 
+import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
+import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
+import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
+import com.projetos.diego.pet_management_system.util.PetCreator;
 import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +28,9 @@ class PetOwnerServiceTest {
     @Mock
     private PetOwnerRepository petOwnerRepositoryMock;
 
+    @Mock
+    private PetOwnerMapper petOwnerMapperMock;
+
     @Test
     @DisplayName("listAll returns list of owners when successful")
     void listAll_ReturnsListOfOwners_WhenSuccessful() {
@@ -35,5 +42,22 @@ class PetOwnerServiceTest {
 
         Assertions.assertThat(returnedOwnerList).isNotNull().isNotEmpty().isEqualTo(owners);
         Mockito.verify(petOwnerRepositoryMock, Mockito.times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("save persists owner when successful")
+    void save_PersistsOwner_WhenSuccessful() {
+        PetOwnerPostRequest request = PetOwnerCreator.createPetOwnerPostRequest();
+
+        PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
+
+        BDDMockito.when(petOwnerMapperMock.fromPostRequestToEntity(request))
+                .thenReturn(petOwner);
+        BDDMockito.when(petOwnerRepositoryMock.save(petOwner))
+                .thenReturn(petOwner);
+
+        PetOwner savedOwner = petOwnerService.save(request);
+
+        Assertions.assertThat(savedOwner).isNotNull().isEqualTo(petOwner);
     }
 }
