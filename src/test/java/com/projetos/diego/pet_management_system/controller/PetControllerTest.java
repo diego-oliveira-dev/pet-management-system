@@ -2,11 +2,12 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.dto.PetPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetPutRequest;
+import com.projetos.diego.pet_management_system.dto.PetResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
-import com.projetos.diego.pet_management_system.dto.PetPostRequest;
-import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.service.PetService;
 import com.projetos.diego.pet_management_system.util.PetCreator;
@@ -23,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
@@ -45,24 +47,34 @@ class PetControllerTest {
     @Test
     @DisplayName("listAll returns 200 when successful")
     void listAll_Returns200_WhenSuccessful() throws Exception {
+        Pet pet = PetCreator.createValidPet();
+        pet.setId(1L);
+        PetResponse response = PetCreator.createResponse(pet);
 
-        List<Pet> pets = List.of(PetCreator.createValidPet());
-
-        Mockito.when(petServiceMock.listAllNonPageable()).thenReturn(pets);
+        Mockito.when(petServiceMock.listAllNonPageable()).thenReturn(List.of(pet));
+        Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/pets/all"))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
+                        .value(response.id()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name")
-                        .value(pets.getFirst().getName()));
+                        .value(response.name()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].ownerId")
+                        .value(response.ownerId()));
     }
 
     @Test
     @DisplayName("list returns 200 when successful")
     void list_Returns200_WhenSuccessful() throws Exception {
-        PageImpl<Pet> petPage = new PageImpl<>(List.of(PetCreator.createValidPet()));
+        Pet pet = PetCreator.createValidPet();
+        PetResponse response = PetCreator.createResponse(pet);
+        PageImpl<Pet> petPage = new PageImpl<>(List.of(pet));
 
         Mockito.when(petServiceMock.listAll(ArgumentMatchers.any(Pageable.class)))
                 .thenReturn(petPage);
+        Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -70,8 +82,10 @@ class PetControllerTest {
                         .value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.page.size")
                         .value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].name")
-                        .value(petPage.getContent().getFirst().getName()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                        .value(response.id()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].ownerId")
+                        .value(response.ownerId()));
     }
 
     @Test
@@ -87,32 +101,35 @@ class PetControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.page.totalElements")
                         .value(0))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.page.size")
-                        .value(0));
+                        .value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content")
+                        .isArray());
     }
 
     @Test
     @DisplayName("findById returns 200 when successful")
     void findById_Returns200_WhenSuccessful() throws Exception {
         Pet pet = PetCreator.createValidPet();
+        pet.setId(1L);
+        PetResponse response = PetCreator.createResponse(pet);
 
         Mockito.when(petServiceMock.findByIdOrThrowResourceNotFoundException(pet.getId()))
                 .thenReturn(pet);
+        Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", pet.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
-                        .value(pet.getId()));
+                        .value(response.id()));
     }
 
     @Test
     @DisplayName("findById returns 404 when pet is not found")
     void findById_Returns404_WhenPetIsNotFound() throws Exception {
-        Long id = PetCreator.createValidPet().getId();
-
-        Mockito.when(petServiceMock.findByIdOrThrowResourceNotFoundException(id))
+        Mockito.when(petServiceMock.findByIdOrThrowResourceNotFoundException(ArgumentMatchers.anyLong()))
                 .thenThrow(new ResourceNotFoundException("Pet not found"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", 1L))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
                         .value("Resource Not Found"));
@@ -122,23 +139,31 @@ class PetControllerTest {
     @DisplayName("findByName returns 200 when successful")
     void findByName_Returns200_WhenSuccessful() throws Exception {
         Pet pet = PetCreator.createValidPet();
+        pet.setId(1L);
+        PetResponse response = PetCreator.createResponse(pet);
 
-        Mockito.when(petServiceMock.findByName(pet.getName()))
-                .thenReturn(List.of(pet));
+        Mockito.when(petServiceMock.findByName(pet.getName())).thenReturn(List.of(pet));
+        Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/pets/find?name={name}", pet.getName()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
+                        .value(response.id()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name")
-                        .value(pet.getName()));
+                        .value(response.name()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].ownerId")
+                        .value(response.ownerId()));
     }
 
     @Test
     @DisplayName("save returns 201 when successful")
     void save_Returns201_WhenSuccessful() throws Exception {
-        Pet pet = PetCreator.createValidPet();
         PetPostRequest petPostRequest = PetCreator.createPetPostRequest();
+        Pet pet = PetCreator.createValidPet();
+        PetResponse response = PetCreator.createResponse(pet);
 
         Mockito.when(petServiceMock.save(petPostRequest)).thenReturn(pet);
+        Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
                         .accept(MediaType.APPLICATION_JSON)
@@ -146,7 +171,11 @@ class PetControllerTest {
                         .content(objectMapper.writeValueAsString(petPostRequest)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
-                        .value(pet.getId()));
+                        .value(response.id()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+                        .value(response.name()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ownerId")
+                        .value(response.ownerId()));
     }
 
     @Test
@@ -285,24 +314,20 @@ class PetControllerTest {
     @Test
     @DisplayName("delete returns 204 when successful")
     void delete_Returns204_WhenSuccessful() throws Exception {
-        Long id = PetCreator.createValidPet().getId();
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Mockito.verify(petServiceMock, Mockito.times(1)).delete(id);
+        Mockito.verify(petServiceMock, Mockito.times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("delete returns 404 when pet is not found")
     void delete_Returns404_WhenPetIsNotFound() throws Exception {
-        Long id = PetCreator.createValidPet().getId();
-
         BDDMockito.willThrow(new ResourceNotFoundException("Pet not found"))
                 .given(petServiceMock)
                 .delete(ArgumentMatchers.anyLong());
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }

@@ -5,6 +5,7 @@ import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
+import com.projetos.diego.pet_management_system.dto.PetResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -72,6 +73,20 @@ public class PetCreator {
                 .breed("Vira-lata")
                 .postalCode("64009100")
                 .ownerId(1L)
+                .build();
+    }
+
+    public static PetResponse createResponse(Pet pet) {
+        return PetResponse.builder()
+                .id(pet.getId())
+                .name(pet.getName())
+                .type(pet.getType())
+                .sex(pet.getSex())
+                .birthDate(pet.getBirthDate())
+                .weight(pet.getWeight())
+                .breed(pet.getBreed())
+                .address(pet.getAddress())
+                .ownerId(pet.getPetOwner().getId())
                 .build();
     }
 }
