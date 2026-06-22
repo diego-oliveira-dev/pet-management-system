@@ -21,7 +21,7 @@ public class PetCreator {
                 .weight(20.0)
                 .breed("Vira-lata")
                 .address(createValidAddress())
-                .petOwner(new PetOwner(1L, "Diego Oliveira", List.of()))
+                .petOwner(PetOwnerCreator.createValidPetOwner())
                 .build();
     }
 
