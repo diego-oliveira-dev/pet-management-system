@@ -35,7 +35,8 @@ public class Pet {
 
     private String breed;
 
-    private String address;
+    @Embedded
+    private Address address;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)

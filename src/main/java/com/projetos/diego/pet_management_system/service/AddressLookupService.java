@@ -1,5 +1,7 @@
 package com.projetos.diego.pet_management_system.service;
 
+import com.projetos.diego.pet_management_system.domain.Address;
+
 public interface AddressLookupService {
-    String findByPostalCode(String postalCode);
+    Address findByPostalCode(String postalCode);
 }

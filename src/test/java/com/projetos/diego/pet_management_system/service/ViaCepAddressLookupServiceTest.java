@@ -2,8 +2,10 @@ package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.client.ViaCepClient;
 import com.projetos.diego.pet_management_system.client.ViaCepResponse;
+import com.projetos.diego.pet_management_system.domain.Address;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
+import com.projetos.diego.pet_management_system.util.PetCreator;
 import com.projetos.diego.pet_management_system.util.ViaCepResponseCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -32,27 +34,12 @@ class ViaCepAddressLookupServiceTest {
         BDDMockito.when(viaCepClientMock.findByPostalCode(validPostalCode))
                 .thenReturn(response);
 
-        String address = viaCepAddressLookupService.findByPostalCode(validPostalCode);
-        String expectedAddress = String.format("%s, %s, %s - %s, %s",
-                response.getLogradouro(),
-                response.getBairro(),
-                response.getLocalidade(),
-                response.getUf().toUpperCase(),
-                response.getCep()
-        );
+        Address address = viaCepAddressLookupService.findByPostalCode(validPostalCode);
+        Address expectedAddress = PetCreator.createValidAddress();
 
-        Assertions.assertThat(address).isNotNull().isNotBlank().isEqualTo(expectedAddress);
+        Assertions.assertThat(address).isNotNull().isEqualTo(expectedAddress);
         Mockito.verify(viaCepClientMock, Mockito.times(1))
                 .findByPostalCode(validPostalCode);
-    }
-
-    @Test
-    @DisplayName("findByPostalCode returns null when postal code is null")
-    void findByPostalCode_ReturnsNull_WhenPostalCodeIsNUll() {
-        String address = viaCepAddressLookupService.findByPostalCode(null);
-
-        Assertions.assertThat(address).isNull();
-        Mockito.verifyNoInteractions(viaCepClientMock);
     }
 
     @Test

@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class PetPostRequest {
-    @NotBlank(message = "Pet name cannot be empty or blank")
+    @NotBlank(message = "Pet name cannot be empty, blank or null")
     @Schema(description = "This is the name of the pet.",
             example = "Rex",
             requiredMode = Schema.RequiredMode.REQUIRED)
@@ -41,7 +41,7 @@ public class PetPostRequest {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate birthDate;
 
-    @NotNull(message = "Pet weight cannot be empty")
+    @NotNull(message = "Pet weight cannot be null")
     @DecimalMin(value = "0.5", message = "Pet weight must be greater than or equal to 0.5")
     @DecimalMax(value = "150.0", message = "Pet weight must be less than or equal to 150.0")
     @Schema(description = "This is the weight of the pet. Must be a number between 0.5 and 150.0 inclusive.",
@@ -57,10 +57,10 @@ public class PetPostRequest {
     private String breed;
 
     @Pattern(regexp = "^\\d{8}$", message = "Postal code must be exactly 8 digits long")
-    @Pattern(regexp = ".*\\S+.*", message = "Postal code cannot be empty or blank")
+    @NotBlank(message = "Pet postal code cannot be empty, blank or null")
     @Schema(description = "This is the postal code of the owner. Must be exactly 8 digits long without empty spaces",
             example = "64009100",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            requiredMode = Schema.RequiredMode.REQUIRED,
             nullable = true)
     private String postalCode;
 
