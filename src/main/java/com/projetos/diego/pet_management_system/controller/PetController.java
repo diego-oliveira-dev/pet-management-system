@@ -62,9 +62,18 @@ public class PetController {
     public ResponseEntity<PetResponse> findById(
             @Parameter(name = "id", description = "This is the ID of the pet", example = "42")
             @PathVariable long id) {
-        Pet pet = petService.findByIdOrThrowResourceNotFoundException(id);
+        Pet pet = petService.findPetsById(id);
         PetResponse response = petMapper.toResponse(pet);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<PetResponse>> findByOwnerId(
+            @Parameter(name = "ownerId", description = "This is the ID of the pet owner", example = "12")
+            @PathVariable long ownerId) {
+        List<Pet> pets = petService.findPetsByOwnerId(ownerId);
+        List<PetResponse> responseList = pets.stream().map(petMapper::toResponse).toList();
+        return ResponseEntity.ok(responseList);
     }
 
     @Operation(summary = "List pets with similar names",
@@ -91,8 +100,8 @@ public class PetController {
             @ApiResponse(responseCode = "502", description = "Address lookup service did not function correctly")
     })
     @PostMapping
-    public ResponseEntity<PetResponse> save(@RequestBody @Valid PetPostRequest petPostRequest) {
-        Pet savedPet = petService.save(petPostRequest);
+    public ResponseEntity<PetResponse> save(@RequestBody @Valid PetPostRequest request) {
+        Pet savedPet = petService.save(request);
         PetResponse response = petMapper.toResponse(savedPet);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -104,8 +113,8 @@ public class PetController {
             @ApiResponse(responseCode = "404", description = "Pet does not exist in the database")
     })
     @PutMapping
-    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequest petPutRequest) {
-        petService.replace(petPutRequest);
+    public ResponseEntity<Void> replace(@RequestBody @Valid PetPutRequest request) {
+        petService.replace(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
