@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class PetOwnerService {
         return petOwnerRepository.findAll();
     }
 
-    public PetOwner save(PetOwnerPostRequest request) {
+    public PetOwner save(PetOwnerRequest request) {
         PetOwner owner = petOwnerMapper.fromPostRequestToEntity(request);
         return petOwnerRepository.save(owner);
     }

@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.mapper;
 
 import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
 import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class PetOwnerMapper {
                 .build();
     }
 
-    public PetOwner fromPostRequestToEntity(PetOwnerPostRequest request) {
+    public PetOwner fromPostRequestToEntity(PetOwnerRequest request) {
         return PetOwner.builder()
                 .name(request.getName())
                 .pets(List.of())

@@ -2,7 +2,7 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
 import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
 import com.projetos.diego.pet_management_system.service.PetOwnerService;
@@ -54,7 +54,7 @@ class PetOwnerControllerTest {
     @Test
     @DisplayName("save returns 201 when successful")
     void save_Returns201_WhenSuccessful() throws Exception {
-        PetOwnerPostRequest request = PetOwnerCreator.createPetOwnerPostRequest();
+        PetOwnerRequest request = PetOwnerCreator.createPetOwnerPostRequest();
         PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
         PetOwnerResponse response = PetOwnerCreator.createResponse(petOwner);
 

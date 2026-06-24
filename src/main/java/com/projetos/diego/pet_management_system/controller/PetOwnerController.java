@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.controller;
 
 import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
 import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
 import com.projetos.diego.pet_management_system.service.PetOwnerService;
@@ -28,7 +28,7 @@ public class PetOwnerController {
     }
 
     @PostMapping
-    public ResponseEntity<PetOwnerResponse> save(@RequestBody @Valid PetOwnerPostRequest request) {
+    public ResponseEntity<PetOwnerResponse> save(@RequestBody @Valid PetOwnerRequest request) {
         PetOwner savedOwner = petOwnerService.save(request);
         PetOwnerResponse response = petOwnerMapper.toResponse(savedOwner);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

@@ -1,11 +1,9 @@
 package com.projetos.diego.pet_management_system.service;
 
-import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
+import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
-import com.projetos.diego.pet_management_system.util.PetCreator;
 import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +45,7 @@ class PetOwnerServiceTest {
     @Test
     @DisplayName("save persists owner when successful")
     void save_PersistsOwner_WhenSuccessful() {
-        PetOwnerPostRequest request = PetOwnerCreator.createPetOwnerPostRequest();
+        PetOwnerRequest request = PetOwnerCreator.createPetOwnerPostRequest();
 
         PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
 
