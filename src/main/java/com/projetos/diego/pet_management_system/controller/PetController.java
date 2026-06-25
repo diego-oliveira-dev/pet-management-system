@@ -12,15 +12,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Log4j2
 @RestController
 @RequestMapping("pets")
 @RequiredArgsConstructor
@@ -124,6 +128,7 @@ public class PetController {
             @ApiResponse(responseCode = "204", description = "Pet was deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Pet does not exist in the database")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(
             @Parameter(name = "id", description = "This is the ID of the pet", example = "42")
