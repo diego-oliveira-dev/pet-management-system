@@ -1,6 +1,7 @@
 package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projetos.diego.pet_management_system.config.SecurityConfig;
 import com.projetos.diego.pet_management_system.domain.Pet;
 import com.projetos.diego.pet_management_system.domain.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
@@ -11,6 +12,7 @@ import com.projetos.diego.pet_management_system.exception.ResourceNotFoundExcept
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.service.PetService;
+import com.projetos.diego.pet_management_system.util.JwtCreator;
 import com.projetos.diego.pet_management_system.util.PetCreator;
 import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import org.junit.jupiter.api.DisplayName;
@@ -20,18 +22,19 @@ import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
 @WebMvcTest(PetController.class)
+@Import(SecurityConfig.class)
 class PetControllerTest {
 
     @Autowired
@@ -56,8 +59,8 @@ class PetControllerTest {
         Mockito.when(petServiceMock.listAllNonPageable()).thenReturn(List.of(pet));
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/all"))
-                .andDo(MockMvcResultHandlers.print())
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/all")
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
                         .value(response.id()))
@@ -78,7 +81,8 @@ class PetControllerTest {
                 .thenReturn(petPage);
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets")
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.page.totalElements")
                         .value(1))
@@ -91,6 +95,13 @@ class PetControllerTest {
     }
 
     @Test
+    @DisplayName("list returns 401 when user is not authenticated")
+    void list_Returns401_WhenUserIsNotAuthenticated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("list returns 200 and empty page when no pet exists")
     void list_Returns200AndEmptyPage_WhenNoPetExists() throws Exception {
         PageImpl<Pet> petPage = new PageImpl<>(List.of());
@@ -98,7 +109,8 @@ class PetControllerTest {
         Mockito.when(petServiceMock.listAll(ArgumentMatchers.any(Pageable.class)))
                 .thenReturn(petPage);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets")
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.page.totalElements")
                         .value(0))
@@ -119,7 +131,8 @@ class PetControllerTest {
                 .thenReturn(pet);
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", pet.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", pet.getId())
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
                         .value(response.id()));
@@ -131,7 +144,8 @@ class PetControllerTest {
         Mockito.when(petServiceMock.findPetsById(ArgumentMatchers.anyLong()))
                 .thenThrow(new ResourceNotFoundException("Pet not found"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", 1L))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{id}", 1L)
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
                         .value("Resource Not Found"));
@@ -149,7 +163,8 @@ class PetControllerTest {
                 .thenReturn(List.of(pet));
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/owner/{ownerId}", petOwner.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/owner/{ownerId}", petOwner.getId())
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
                         .value(response.id()))
@@ -163,7 +178,8 @@ class PetControllerTest {
         Mockito.when(petServiceMock.findPetsByOwnerId(ArgumentMatchers.anyLong()))
                 .thenThrow(new ResourceNotFoundException("Owner not found"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/owner/{ownerId}", 1L))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/owner/{ownerId}", 1L)
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title")
                         .value("Resource Not Found"));
@@ -179,7 +195,8 @@ class PetControllerTest {
         Mockito.when(petServiceMock.findByName(pet.getName())).thenReturn(List.of(pet));
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/find?name={name}", pet.getName()))
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/find?name={name}", pet.getName())
+                        .with(JwtCreator.createUserJWT()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
                         .value(response.id()))
@@ -200,6 +217,7 @@ class PetControllerTest {
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPostRequest)))
@@ -213,12 +231,20 @@ class PetControllerTest {
     }
 
     @Test
+    @DisplayName("save returns 401 when request is not authenticated")
+    void save_Returns401_WhenRequestIsNotAuthenticated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/pets"))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("save returns 400 when weight is negative")
     void save_Returns400_WhenWeightIsNegative() throws Exception {
         PetPostRequest petPostRequest = PetCreator.createPetPostRequest();
         petPostRequest.setWeight(-32.0);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPostRequest))
                         .accept(MediaType.APPLICATION_JSON))
@@ -234,6 +260,7 @@ class PetControllerTest {
         petPostRequest.setName("");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPostRequest))
                         .accept(MediaType.APPLICATION_JSON))
@@ -250,6 +277,7 @@ class PetControllerTest {
                 .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPostRequest))
                         .accept(MediaType.APPLICATION_JSON))
@@ -266,6 +294,7 @@ class PetControllerTest {
                 .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPostRequest))
                         .accept(MediaType.APPLICATION_JSON))
@@ -280,6 +309,7 @@ class PetControllerTest {
         PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequest)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -292,6 +322,7 @@ class PetControllerTest {
         petPutRequest.setId(null);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequest)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -308,6 +339,7 @@ class PetControllerTest {
                 .replace(petPutRequest);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequest)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -322,6 +354,7 @@ class PetControllerTest {
                 .replace(petPutRequest);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequest)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -338,6 +371,7 @@ class PetControllerTest {
                 .replace(petPutRequest);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
+                        .with(JwtCreator.createUserJWT())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequest)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -348,7 +382,8 @@ class PetControllerTest {
     @Test
     @DisplayName("delete returns 204 when successful")
     void delete_Returns204_WhenSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L)
+                        .with(JwtCreator.createAdminJWT()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Mockito.verify(petServiceMock, Mockito.times(1)).delete(1L);
@@ -361,7 +396,16 @@ class PetControllerTest {
                 .given(petServiceMock)
                 .delete(ArgumentMatchers.anyLong());
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L)
+                        .with(JwtCreator.createAdminJWT()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("delete returns 403 when user is not admin")
+    void delete_Returns403_WhenUserIsNotAdmin() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{id}", 1L)
+                        .with(JwtCreator.createUserJWT()))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 }
