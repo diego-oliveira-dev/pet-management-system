@@ -16,6 +16,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return petOwnerRepository.findByUsername(username)
                 .map(user -> new UserAuthenticated(user))
-                .orElseThrow(() -> new UsernameNotFoundException("Owner not found with username " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        String.format("Owner not found with username '%s'", username)));
     }
 }

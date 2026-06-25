@@ -108,6 +108,16 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(exceptionDetails, HttpStatus.BAD_GATEWAY);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ExceptionDetails> handleInvalidCredentials(InvalidCredentialsException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "Invalid Credentials",
+                HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionDetails> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
