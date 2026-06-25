@@ -1,6 +1,6 @@
 package com.projetos.diego.pet_management_system.util;
 
-import com.projetos.diego.pet_management_system.client.ViaCepResponse;
+import com.projetos.diego.pet_management_system.dto.ViaCepResponse;
 
 public class ViaCepResponseCreator {
     public static ViaCepResponse createViaCepResponse() {

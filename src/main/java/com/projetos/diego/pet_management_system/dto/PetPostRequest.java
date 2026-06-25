@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

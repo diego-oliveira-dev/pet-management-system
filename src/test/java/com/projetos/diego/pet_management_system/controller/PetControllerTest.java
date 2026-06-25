@@ -2,8 +2,8 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.config.SecurityConfig;
-import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.domain.PetOwner;
+import com.projetos.diego.pet_management_system.domain.pet.Pet;
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.PetPutRequest;
 import com.projetos.diego.pet_management_system.dto.PetResponse;

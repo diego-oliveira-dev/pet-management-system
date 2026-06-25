@@ -1,4 +1,4 @@
-package com.projetos.diego.pet_management_system.domain;
+package com.projetos.diego.pet_management_system.domain.pet;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

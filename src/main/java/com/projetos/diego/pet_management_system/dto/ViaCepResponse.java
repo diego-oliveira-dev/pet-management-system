@@ -1,4 +1,4 @@
-package com.projetos.diego.pet_management_system.client;
+package com.projetos.diego.pet_management_system.dto;
 
 import lombok.Builder;
 import lombok.Data;

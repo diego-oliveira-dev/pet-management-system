@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projetos.diego.pet_management_system.domain.PetOwner;
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
 import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;

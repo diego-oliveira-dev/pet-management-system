@@ -27,9 +27,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-@EnableConfigurationProperties(RSAKeyProperties.class)
+@EnableConfigurationProperties(RSAKeyPropertiesConfig.class)
 public class SecurityConfig {
-    private final RSAKeyProperties keys;
+    private final RSAKeyPropertiesConfig keys;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

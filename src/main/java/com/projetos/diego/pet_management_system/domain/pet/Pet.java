@@ -1,5 +1,6 @@
-package com.projetos.diego.pet_management_system.domain;
+package com.projetos.diego.pet_management_system.domain.pet;
 
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import jakarta.persistence.*;
 import lombok.*;
 
