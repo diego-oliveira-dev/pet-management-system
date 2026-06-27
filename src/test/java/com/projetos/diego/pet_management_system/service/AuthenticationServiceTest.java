@@ -25,14 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
 
     @InjectMocks
     private AuthenticationService authenticationService;
-
 
     @Mock
     private JwtService jwtServiceMock;

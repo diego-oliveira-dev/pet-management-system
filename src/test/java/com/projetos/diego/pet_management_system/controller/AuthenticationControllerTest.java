@@ -2,10 +2,14 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.config.SecurityConfig;
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
+import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
 import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidCredentialsException;
+import com.projetos.diego.pet_management_system.exception.UsernameAlreadyExistsException;
 import com.projetos.diego.pet_management_system.service.AuthenticationService;
+import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -32,6 +36,73 @@ class AuthenticationControllerTest {
     private AuthenticationService authenticationServiceMock;
 
     @Test
+    @DisplayName("register returns 201 when successful")
+    void register_Returns201_WhenSuccessful() throws Exception {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .build();
+        AuthenticationResponse response = AuthenticationResponse.builder()
+                .token("jwt-token")
+                .type("Bearer")
+                .owner(PetOwnerCreator.createResponse(PetOwnerCreator.createValidPetOwner()))
+                .build();
+
+        BDDMockito.when(authenticationServiceMock.register(request))
+                .thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token")
+                        .value(response.token()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.type")
+                        .value(response.type()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.owner.username")
+                        .value(response.owner().username()));
+    }
+
+    @Test
+    @DisplayName("register returns 400 when credentials are invalid")
+    void register_Returns400_WhenCredentialsAreInvalid() throws Exception {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("                   ")
+                .username("")
+                .password(null)
+                .build();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Validation Failed"));;
+    }
+
+    @Test
+    @DisplayName("register returns 409 when username already exists")
+    void register_Returns409_WhenUsernameAlreadyExists() throws Exception {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .build();
+
+        BDDMockito.when(authenticationServiceMock.register(request))
+                .thenThrow(new UsernameAlreadyExistsException("Username is already in use"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isConflict());
+    }
+
+    @Test
     @DisplayName("login returns 200 when successful")
     void login_Returns200_WhenSuccessful() throws Exception {
         LoginRequest request = LoginRequest.builder()
@@ -41,6 +112,7 @@ class AuthenticationControllerTest {
         AuthenticationResponse response = AuthenticationResponse.builder()
                 .token("token-value")
                 .type("Bearer")
+                .owner(PetOwnerCreator.createResponse(PetOwnerCreator.createValidPetOwner()))
                 .build();
 
         BDDMockito.when(authenticationServiceMock.login(request))
@@ -54,7 +126,9 @@ class AuthenticationControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.token")
                         .value(response.token()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.type")
-                        .value(response.type()));
+                        .value(response.type()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.owner.username")
+                        .value(response.owner().username()));
     }
 
     @Test
