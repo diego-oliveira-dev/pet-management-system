@@ -1,9 +1,9 @@
 package com.projetos.diego.pet_management_system.controller;
 
 import com.projetos.diego.pet_management_system.domain.pet.Pet;
-import com.projetos.diego.pet_management_system.dto.PetPostRequest;
-import com.projetos.diego.pet_management_system.dto.PetPutRequest;
-import com.projetos.diego.pet_management_system.dto.PetResponse;
+import com.projetos.diego.pet_management_system.dto.request.PetPostRequest;
+import com.projetos.diego.pet_management_system.dto.request.PetPutRequest;
+import com.projetos.diego.pet_management_system.dto.response.PetResponse;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;

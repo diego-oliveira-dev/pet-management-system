@@ -2,9 +2,9 @@ package com.projetos.diego.pet_management_system.util;
 
 import com.projetos.diego.pet_management_system.domain.pet.Address;
 import com.projetos.diego.pet_management_system.domain.pet.Pet;
-import com.projetos.diego.pet_management_system.dto.PetPostRequest;
-import com.projetos.diego.pet_management_system.dto.PetPutRequest;
-import com.projetos.diego.pet_management_system.dto.PetResponse;
+import com.projetos.diego.pet_management_system.dto.request.PetPostRequest;
+import com.projetos.diego.pet_management_system.dto.request.PetPutRequest;
+import com.projetos.diego.pet_management_system.dto.response.PetResponse;
 
 import java.time.LocalDate;
 

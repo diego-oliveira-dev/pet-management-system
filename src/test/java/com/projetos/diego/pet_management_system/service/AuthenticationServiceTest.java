@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.service;
 
-import com.projetos.diego.pet_management_system.dto.AuthenticationRequest;
-import com.projetos.diego.pet_management_system.dto.AuthenticationResponse;
+import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
+import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.security.JwtService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ class AuthenticationServiceTest {
     @Test
     @DisplayName("login returns token when credentials are valid")
     void login_ReturnsToken_WhenCredentialsAreValid() {
-        AuthenticationRequest request = AuthenticationRequest.builder()
+        LoginRequest request = LoginRequest.builder()
                 .username("diego123")
                 .password("secret123")
                 .build();
@@ -50,7 +50,7 @@ class AuthenticationServiceTest {
     @Test
     @DisplayName("login throws UsernameNotFoundException when user does not exist")
     void login_ThrowsUsernameNotFoundException_WhenUserDoesNotExist() {
-        AuthenticationRequest request = AuthenticationRequest.builder()
+        LoginRequest request = LoginRequest.builder()
                 .username("invalid")
                 .password("password")
                 .build();
@@ -66,7 +66,7 @@ class AuthenticationServiceTest {
     @Test
     @DisplayName("login throws BadCredentialsException when password is invalid")
     void login_ThrowsBadCredentialsException_WhenPasswordIsInvalid() {
-        AuthenticationRequest request = AuthenticationRequest.builder()
+        LoginRequest request = LoginRequest.builder()
                 .username("diego123")
                 .password("wrong")
                 .build();

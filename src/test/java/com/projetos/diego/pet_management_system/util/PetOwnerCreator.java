@@ -1,8 +1,8 @@
 package com.projetos.diego.pet_management_system.util;
 
 import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerRequest;
-import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
+import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
+import com.projetos.diego.pet_management_system.dto.response.PetOwnerResponse;
 
 import java.util.List;
 
@@ -22,8 +22,8 @@ public class PetOwnerCreator {
                 .build();
     }
 
-    public static PetOwnerRequest createPetOwnerPostRequest() {
-        return PetOwnerRequest.builder()
+    public static RegisterRequest createPetOwnerPostRequest() {
+        return RegisterRequest.builder()
                 .name("Diego Oliveira")
                 .build();
     }

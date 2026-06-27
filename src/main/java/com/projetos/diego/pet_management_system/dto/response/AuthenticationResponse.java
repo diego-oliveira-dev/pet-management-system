@@ -1,9 +1,10 @@
-package com.projetos.diego.pet_management_system.dto;
+package com.projetos.diego.pet_management_system.dto.response;
 
 import lombok.Builder;
 
 @Builder
 public record AuthenticationResponse(
         String token,
-        String type
+        String type,
+        PetOwnerResponse owner
 ) {}

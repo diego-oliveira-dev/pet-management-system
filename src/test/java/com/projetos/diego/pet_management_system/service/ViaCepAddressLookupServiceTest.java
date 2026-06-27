@@ -1,7 +1,7 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.client.ViaCepClient;
-import com.projetos.diego.pet_management_system.dto.ViaCepResponse;
+import com.projetos.diego.pet_management_system.dto.response.ViaCepResponse;
 import com.projetos.diego.pet_management_system.domain.pet.Address;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;

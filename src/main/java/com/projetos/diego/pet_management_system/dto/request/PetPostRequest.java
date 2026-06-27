@@ -1,4 +1,4 @@
-package com.projetos.diego.pet_management_system.dto;
+package com.projetos.diego.pet_management_system.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.projetos.diego.pet_management_system.domain.pet.Pet;
