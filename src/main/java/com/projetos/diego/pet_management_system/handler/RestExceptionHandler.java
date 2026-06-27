@@ -118,6 +118,16 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ExceptionDetails> handleAlreadyExistingUsername(UsernameAlreadyExistsException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "Invalid Username",
+                HttpStatus.CONFLICT);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionDetails> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();

@@ -16,20 +16,18 @@ import java.util.stream.Collectors;
 public class JwtService {
     private final JwtEncoder encoder;
 
-    public String generateToken(Authentication authentication) {
+    public String generateToken(UserAuthenticated user) {
         Instant now = Instant.now();
         long expiry = 36000L;
-        String authorities = authentication.getAuthorities()
+        String roles = user.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
-        UserAuthenticated userAuthenticated = (UserAuthenticated) authentication.getPrincipal();
-        String ownerId = String.valueOf(userAuthenticated.getPetOwner().getId());
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("pet-management-system")
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiry))
-                .subject(ownerId)
-                .claim("authorities", authorities)
+                .subject(String.valueOf(user.getPetOwner().getId()))
+                .claim("roles", roles)
                 .build();
         return encoder.encode(JwtEncoderParameters.from(claims))
                 .getTokenValue();

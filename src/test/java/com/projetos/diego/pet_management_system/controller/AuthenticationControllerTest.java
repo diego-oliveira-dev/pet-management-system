@@ -2,8 +2,8 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.config.SecurityConfig;
-import com.projetos.diego.pet_management_system.dto.AuthenticationRequest;
-import com.projetos.diego.pet_management_system.dto.AuthenticationResponse;
+import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
+import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidCredentialsException;
 import com.projetos.diego.pet_management_system.service.AuthenticationService;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +34,7 @@ class AuthenticationControllerTest {
     @Test
     @DisplayName("login returns 200 when successful")
     void login_Returns200_WhenSuccessful() throws Exception {
-        AuthenticationRequest request = AuthenticationRequest.builder()
+        LoginRequest request = LoginRequest.builder()
                 .username("diego123")
                 .password("secret123")
                 .build();
@@ -60,7 +60,7 @@ class AuthenticationControllerTest {
     @Test
     @DisplayName("login returns 400 when credentials are invalid")
     void login_Returns400_WhenCredentialsAreInvalid() throws Exception {
-        AuthenticationRequest request = AuthenticationRequest.builder()
+        LoginRequest request = LoginRequest.builder()
                 .username("")
                 .password(null)
                 .build();
@@ -77,7 +77,7 @@ class AuthenticationControllerTest {
     @Test
     @DisplayName("login returns 401 when user is not found or password is incorrect")
     void login_Returns401_WhenUserIsNotFoundOrPasswordIsIncorrect() throws Exception {
-        AuthenticationRequest request = AuthenticationRequest.builder()
+        LoginRequest request = LoginRequest.builder()
                 .username("invalid")
                 .password("not a password")
                 .build();
