@@ -5,6 +5,7 @@ import com.projetos.diego.pet_management_system.domain.owner.UserRole;
 import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
 import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
+import com.projetos.diego.pet_management_system.dto.response.PetOwnerResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidCredentialsException;
 import com.projetos.diego.pet_management_system.exception.UsernameAlreadyExistsException;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
@@ -37,9 +38,8 @@ public class AuthenticationService {
         }
         PetOwner ownerToBeSaved = petOwnerMapper.fromPostRequestToEntity(
                 request,
-                passwordEncoder.encode(request.getPassword())
-        );
-        ownerToBeSaved.setRole(UserRole.USER);
+                passwordEncoder.encode(request.getPassword()),
+                UserRole.USER);
         PetOwner savedOwner = petOwnerRepository.save(ownerToBeSaved);
         return issueToken(new UserAuthenticated(savedOwner));
     }
@@ -58,9 +58,11 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse issueToken(UserAuthenticated user) {
+        PetOwnerResponse ownerResponse = petOwnerMapper.toResponse(user.getPetOwner());
         return AuthenticationResponse.builder()
                 .token(jwtService.generateToken(user))
                 .type("Bearer")
+                .owner(ownerResponse)
                 .build();
     }
 }
