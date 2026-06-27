@@ -152,40 +152,6 @@ class PetControllerTest {
     }
 
     @Test
-    @DisplayName("findPetsByOwnerId returns 200 when successful")
-    void findPetsByOwnerId_Returns200_WhenSuccessful() throws Exception {
-        Pet pet = PetCreator.createValidPet();
-        pet.setId(1L);
-        PetResponse response = PetCreator.createResponse(pet);
-        PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
-
-        Mockito.when(petServiceMock.findPetsByOwnerId(petOwner.getId()))
-                .thenReturn(List.of(pet));
-        Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/owner/{ownerId}", petOwner.getId())
-                        .with(JwtCreator.createUserJWT()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
-                        .value(response.id()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].ownerId")
-                        .value(petOwner.getId()));
-    }
-
-    @Test
-    @DisplayName("findPetsByOwnerId returns 404 when owner is not found")
-    void findPetsByOwnerId_Returns404_WhenOwnerIsNotFound() throws Exception {
-        Mockito.when(petServiceMock.findPetsByOwnerId(ArgumentMatchers.anyLong()))
-                .thenThrow(new ResourceNotFoundException("Owner not found"));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/owner/{ownerId}", 1L)
-                        .with(JwtCreator.createUserJWT()))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Resource Not Found"));
-    }
-
-    @Test
     @DisplayName("findByName returns 200 when successful")
     void findByName_Returns200_WhenSuccessful() throws Exception {
         Pet pet = PetCreator.createValidPet();

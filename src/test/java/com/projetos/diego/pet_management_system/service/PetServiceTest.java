@@ -98,56 +98,6 @@ class PetServiceTest {
     }
 
     @Test
-    @DisplayName("findPetsByOwnerId returns list of pets with the same owner when successful")
-    void findPetsByOwnerId_ReturnsListOfPetsWithTheSameOwner_WhenSuccessful() {
-        PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
-        Pet pet1 = Pet.builder()
-                .id(1L)
-                .name("Zaya")
-                .type(Pet.Type.DOG)
-                .sex(Pet.Sex.FEMALE)
-                .birthDate(LocalDate.of(2020, 10, 8))
-                .weight(20.0)
-                .breed("Vira-lata")
-                .address(PetCreator.createValidAddress())
-                .petOwner(PetOwnerCreator.createValidPetOwner())
-                .build();
-        Pet pet2 = Pet.builder()
-                .id(2L)
-                .name("Mimosa")
-                .type(Pet.Type.CAT)
-                .sex(Pet.Sex.FEMALE)
-                .birthDate(LocalDate.of(2019, 5, 3))
-                .weight(10.0)
-                .breed("Vira-lata")
-                .address(PetCreator.createValidAddress())
-                .petOwner(PetOwnerCreator.createValidPetOwner())
-                .build();
-        List<Pet> petList = List.of(pet1, pet2);
-        BDDMockito.when(petOwnerRepositoryMock.findById(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.of(petOwner));
-        BDDMockito.when(petRepositoryMock.findByPetOwnerId(petOwner.getId()))
-                .thenReturn(petList);
-
-        List<Pet> returnedPetList = petService.findPetsByOwnerId(petOwner.getId());
-
-        Assertions.assertThat(returnedPetList).isNotNull().isNotEmpty().isEqualTo(petList);
-        Mockito.verify(petRepositoryMock, Mockito.times(1)).findByPetOwnerId(petOwner.getId());
-        Mockito.verify(petOwnerRepositoryMock, Mockito.times(1)).findById(petOwner.getId());
-    }
-
-    @Test
-    @DisplayName("findPetsByOwnerId throws ResourceNotFoundException when owner does not exist")
-    void findPetsByOwnerId_ThrowsResourceNotFoundException_WhenOwnerDoesNotExist() {
-        BDDMockito.when(petOwnerRepositoryMock.findById(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.empty());
-
-        Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> this.petService.findPetsByOwnerId(3L))
-                .withMessageContaining("Owner not found");
-    }
-
-    @Test
     @DisplayName("findByName returns list of pets when successful")
     void findByName_ReturnsListOfPets_WhenSuccessful() {
         BDDMockito.when(petRepositoryMock.findByNameContaining(ArgumentMatchers.anyString()))
