@@ -3,18 +3,14 @@ package com.projetos.diego.pet_management_system.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.config.SecurityConfig;
 import com.projetos.diego.pet_management_system.domain.pet.Pet;
-import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.dto.request.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.request.PetPutRequest;
 import com.projetos.diego.pet_management_system.dto.response.PetResponse;
-import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
-import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.service.PetService;
 import com.projetos.diego.pet_management_system.util.JwtCreator;
 import com.projetos.diego.pet_management_system.util.PetCreator;
-import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -95,13 +91,6 @@ class PetControllerTest {
     }
 
     @Test
-    @DisplayName("list returns 401 when user is not authenticated")
-    void list_Returns401_WhenUserIsNotAuthenticated() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-    }
-
-    @Test
     @DisplayName("list returns 200 and empty page when no pet exists")
     void list_Returns200AndEmptyPage_WhenNoPetExists() throws Exception {
         PageImpl<Pet> petPage = new PageImpl<>(List.of());
@@ -118,6 +107,13 @@ class PetControllerTest {
                         .value(0))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content")
                         .isArray());
+    }
+
+    @Test
+    @DisplayName("list returns 401 when user is not authenticated")
+    void list_Returns401_WhenUserIsNotAuthenticated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets"))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -236,40 +232,6 @@ class PetControllerTest {
     }
 
     @Test
-    @DisplayName("save returns 404 when postal code is not found")
-    void save_Returns404_WhenPostalCodeIsNotFound() throws Exception {
-        PetPostRequest petPostRequest = PetCreator.createPetPostRequest();
-        Mockito.when(petServiceMock.save(petPostRequest))
-                .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/pets")
-                        .with(JwtCreator.createUserJWT())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petPostRequest))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Postal Code Not Found"));
-    }
-
-    @Test
-    @DisplayName("save returns 400 when postal code is invalid")
-    void save_Returns400_WhenPostalCodeIsInvalid() throws Exception {
-        PetPostRequest petPostRequest = PetCreator.createPetPostRequest();
-        Mockito.when(petServiceMock.save(petPostRequest))
-                .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/pets")
-                        .with(JwtCreator.createUserJWT())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petPostRequest))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Invalid Postal Code Format"));
-    }
-
-    @Test
     @DisplayName("replace returns 204 when successful")
     void replace_Returns204_WhenSuccessful() throws Exception {
         PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
@@ -309,40 +271,6 @@ class PetControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(petPutRequest)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("replace returns 404 when postal code is not found")
-    void replace_Returns404_WhenPostalCodeIsNotFound() throws Exception {
-        PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
-        BDDMockito.willThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"))
-                .given(petServiceMock)
-                .replace(petPutRequest);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/pets")
-                        .with(JwtCreator.createUserJWT())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petPutRequest)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Postal Code Not Found"));
-    }
-
-    @Test
-    @DisplayName("replace returns 400 when postal code is invalid")
-    void replace_Returns400_WhenPostalCodeIsInvalid() throws Exception {
-        PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
-        BDDMockito.willThrow(new InvalidPostalCodeException("Invalid postal code format"))
-                .given(petServiceMock)
-                .replace(petPutRequest);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/pets")
-                        .with(JwtCreator.createUserJWT())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petPutRequest)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
-                        .value("Invalid Postal Code Format"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.projetos.diego.pet_management_system.service;
 
+import com.projetos.diego.pet_management_system.domain.owner.Address;
 import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.domain.owner.UserRole;
 import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
@@ -7,7 +8,9 @@ import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
 import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.dto.response.PetOwnerResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidCredentialsException;
+import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.UsernameAlreadyExistsException;
+import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetOwnerMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
 import com.projetos.diego.pet_management_system.security.JwtService;
@@ -46,6 +49,9 @@ class AuthenticationServiceTest {
     @Mock
     private PetOwnerRepository petOwnerRepositoryMock;
 
+    @Mock
+    private AddressLookupService addressLookupServiceMock;
+
     @Test
     @DisplayName("register returns token and persists owner when successful")
     void register_ReturnsTokenAndPersistsOwner_WhenSuccessful() {
@@ -53,17 +59,22 @@ class AuthenticationServiceTest {
                 .name("Diego Oliveira")
                 .username("diego123")
                 .password("secret123")
+                .postalCode("64009100")
                 .build();
         String encodedPassword = "encoded password";
         PetOwner owner = PetOwnerCreator.createValidPetOwner();
         owner.setId(1L);
         PetOwnerResponse ownerResponse = PetOwnerCreator.createResponse(owner);
+        Address expectedAddress = PetOwnerCreator.createValidAddress();
 
         BDDMockito.when(petOwnerRepositoryMock.existsByUsername(request.getUsername()))
                 .thenReturn(false);
         BDDMockito.when(passwordEncoderMock.encode(request.getPassword()))
                 .thenReturn(encodedPassword);
-        BDDMockito.when(petOwnerMapperMock.fromPostRequestToEntity(request, encodedPassword, UserRole.USER))
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
+                .thenReturn(expectedAddress);
+        BDDMockito.when(petOwnerMapperMock.fromPostRequestToEntity(
+                        request, encodedPassword, UserRole.USER, expectedAddress))
                 .thenReturn(owner);
         BDDMockito.when(petOwnerMapperMock.toResponse(owner))
                 .thenReturn(ownerResponse);
@@ -78,6 +89,7 @@ class AuthenticationServiceTest {
         Assertions.assertThat("Bearer").isEqualTo(response.type());
         Assertions.assertThat(request.getUsername()).isEqualTo(response.owner().username());
         Assertions.assertThat(owner.getRole()).isEqualTo(UserRole.USER);
+        Assertions.assertThat(request.getPostalCode()).isEqualTo(response.owner().address().getPostalCode());
         Mockito.verify(petOwnerRepositoryMock, Mockito.times(1))
                 .existsByUsername(request.getUsername());
         Mockito.verify(passwordEncoderMock, Mockito.times(1))
@@ -108,6 +120,58 @@ class AuthenticationServiceTest {
     }
 
     @Test
+    @DisplayName("register throws ViaCepPostalCodeNotFoundException when postal code is not found")
+    void register_ThrowsViaCepPostalCodeNotFoundException_WhenPostalCodeIsNotFound() {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .postalCode("non existing postal code")
+                .build();
+        String encodedPassword = "encoded password";
+
+        BDDMockito.when(petOwnerRepositoryMock.existsByUsername(request.getUsername()))
+                .thenReturn(false);
+        BDDMockito.when(passwordEncoderMock.encode(request.getPassword()))
+                .thenReturn(encodedPassword);
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
+                .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
+
+        Assertions.assertThatExceptionOfType(ViaCepPostalCodeNotFoundException.class)
+                .isThrownBy(() -> this.authenticationService.register(request))
+                .withMessageContaining("Postal code not found");
+        Mockito.verify(petOwnerRepositoryMock, Mockito.never()).save(ArgumentMatchers.any());
+        Mockito.verify(petOwnerMapperMock, Mockito.never()).toResponse(ArgumentMatchers.any());
+        Mockito.verify(jwtServiceMock, Mockito.never()).generateToken(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("register throws InvalidPostalCodeException when postal code is invalid")
+    void register_ThrowsInvalidPostalCodeException_WhenPostalCodeIsInvalid() {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .postalCode("invalid postal code")
+                .build();
+        String encodedPassword = "encoded password";
+
+        BDDMockito.when(petOwnerRepositoryMock.existsByUsername(request.getUsername()))
+                .thenReturn(false);
+        BDDMockito.when(passwordEncoderMock.encode(request.getPassword()))
+                .thenReturn(encodedPassword);
+        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
+                .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
+
+        Assertions.assertThatExceptionOfType(InvalidPostalCodeException.class)
+                .isThrownBy(() -> this.authenticationService.register(request))
+                .withMessageContaining("Invalid postal code format");
+        Mockito.verify(petOwnerRepositoryMock, Mockito.never()).save(ArgumentMatchers.any());
+        Mockito.verify(petOwnerMapperMock, Mockito.never()).toResponse(ArgumentMatchers.any());
+        Mockito.verify(jwtServiceMock, Mockito.never()).generateToken(ArgumentMatchers.any());
+    }
+
+    @Test
     @DisplayName("login returns token when credentials are valid")
     void login_ReturnsToken_WhenCredentialsAreValid() {
         LoginRequest request = LoginRequest.builder()
@@ -123,7 +187,7 @@ class AuthenticationServiceTest {
         BDDMockito.when(authenticationManagerMock.authenticate(ArgumentMatchers.any()))
                 .thenReturn(authentication);
         BDDMockito.when(petOwnerMapperMock.toResponse(user.getPetOwner()))
-                        .thenReturn(ownerResponse);
+                .thenReturn(ownerResponse);
         BDDMockito.when(jwtServiceMock.generateToken(user))
                 .thenReturn("jwt-token");
 

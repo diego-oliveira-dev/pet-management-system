@@ -2,17 +2,20 @@ package com.projetos.diego.pet_management_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetos.diego.pet_management_system.config.SecurityConfig;
-import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
 import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
 import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidCredentialsException;
+import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.UsernameAlreadyExistsException;
+import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.service.AuthenticationService;
+import com.projetos.diego.pet_management_system.util.JwtCreator;
 import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -42,6 +45,7 @@ class AuthenticationControllerTest {
                 .name("Diego Oliveira")
                 .username("diego123")
                 .password("secret123")
+                .postalCode("64009100")
                 .build();
         AuthenticationResponse response = AuthenticationResponse.builder()
                 .token("jwt-token")
@@ -62,7 +66,9 @@ class AuthenticationControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.type")
                         .value(response.type()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.owner.username")
-                        .value(response.owner().username()));
+                        .value(response.owner().username()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.owner.address.postalCode")
+                        .value(response.owner().address().getPostalCode()));
     }
 
     @Test
@@ -84,12 +90,57 @@ class AuthenticationControllerTest {
     }
 
     @Test
+    @DisplayName("register returns 400 when postal code is invalid")
+    void register_Returns400_WhenPostalCodeIsInvalid() throws Exception {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .postalCode("invalid postal code")
+                .build();
+        Mockito.when(authenticationServiceMock.register(request))
+                .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .with(JwtCreator.createUserJWT())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Validation Failed"));
+    }
+
+    @Test
+    @DisplayName("register returns 404 when postal code is not found")
+    void register_Returns404_WhenPostalCodeIsNotFound() throws Exception {
+        RegisterRequest request = RegisterRequest.builder()
+                .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .postalCode("99999999")
+                .build();
+        Mockito.when(authenticationServiceMock.register(request))
+                .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .with(JwtCreator.createUserJWT())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title")
+                        .value("Postal Code Not Found"));
+    }
+
+    @Test
     @DisplayName("register returns 409 when username already exists")
     void register_Returns409_WhenUsernameAlreadyExists() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .name("Diego Oliveira")
                 .username("diego123")
                 .password("secret123")
+                .postalCode("64009100")
                 .build();
 
         BDDMockito.when(authenticationServiceMock.register(request))

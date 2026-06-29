@@ -1,13 +1,10 @@
 package com.projetos.diego.pet_management_system.service;
 
-import com.projetos.diego.pet_management_system.domain.pet.Address;
-import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
+import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import com.projetos.diego.pet_management_system.dto.request.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.request.PetPutRequest;
-import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
-import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
 import com.projetos.diego.pet_management_system.repository.PetRepository;
@@ -23,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +36,6 @@ class PetServiceTest {
 
     @Mock
     private PetOwnerRepository petOwnerRepositoryMock;
-
-    @Mock
-    private AddressLookupService addressLookupServiceMock;
 
     @Test
     @DisplayName("listAll returns list of pets inside page when successful")
@@ -126,14 +119,11 @@ class PetServiceTest {
     void save_PersistsPet_WhenSuccessful() {
         PetPostRequest request = PetCreator.createPetPostRequest();
         PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
-        Address expectedAddress = PetCreator.createValidAddress();
         Pet pet = PetCreator.createValidPet();
 
         BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
                 .thenReturn(Optional.of(petOwner));
-        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
-                .thenReturn(expectedAddress);
-        BDDMockito.when(petMapperMock.fromPostRequestToEntity(request, expectedAddress, petOwner))
+        BDDMockito.when(petMapperMock.fromPostRequestToEntity(request, petOwner))
                 .thenReturn(pet);
         BDDMockito.when(petRepositoryMock.save(pet))
                 .thenReturn(pet);
@@ -150,13 +140,10 @@ class PetServiceTest {
         request.setBreed(null);
         PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
         Pet pet = PetCreator.createValidPet();
-        Address expectedAddress = PetCreator.createValidAddress();
 
         BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
                 .thenReturn(Optional.of(petOwner));
-        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
-                .thenReturn(expectedAddress);
-        BDDMockito.when(petMapperMock.fromPostRequestToEntity(request, expectedAddress, petOwner))
+        BDDMockito.when(petMapperMock.fromPostRequestToEntity(request, petOwner))
                 .thenReturn(pet);
         BDDMockito.when(petRepositoryMock.save(pet))
                 .thenReturn(pet);
@@ -177,46 +164,6 @@ class PetServiceTest {
                 .isThrownBy(() -> this.petService.save(request))
                 .withMessageContaining("Owner not found");
         Mockito.verify(petOwnerRepositoryMock).findById(request.getOwnerId());
-        Mockito.verifyNoInteractions(addressLookupServiceMock);
-        Mockito.verifyNoInteractions(petRepositoryMock);
-        Mockito.verifyNoInteractions(petMapperMock);
-    }
-
-    @Test
-    @DisplayName("save does not persists pet when postal code is not found")
-    void save_DoesNotPersistsPet_WhenPostalCodeIsNotFound() {
-        PetPostRequest request = PetCreator.createPetPostRequest();
-        PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
-        BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
-                .thenReturn(Optional.of(petOwner));
-        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
-                .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
-
-        Assertions.assertThatExceptionOfType(ViaCepPostalCodeNotFoundException.class)
-                .isThrownBy(() -> this.petService.save(request))
-                .withMessageContaining("Postal code not found");
-        Mockito.verify(petOwnerRepositoryMock).findById(request.getOwnerId());
-        Mockito.verify(addressLookupServiceMock).findByPostalCode(request.getPostalCode());
-        Mockito.verifyNoInteractions(petRepositoryMock);
-        Mockito.verifyNoInteractions(petMapperMock);
-    }
-
-    @Test
-    @DisplayName("save does not persists pet when postal code is invalid")
-    void save_DoesNotPersistsPet_WhenPostalCodeIsInvalid() {
-        PetPostRequest request = PetCreator.createPetPostRequest();
-        request.setPostalCode("invalid");
-        PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
-        BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
-                .thenReturn(Optional.of(petOwner));
-        BDDMockito.when(addressLookupServiceMock.findByPostalCode(request.getPostalCode()))
-                .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
-
-        Assertions.assertThatExceptionOfType(InvalidPostalCodeException.class)
-                .isThrownBy(() -> this.petService.save(request))
-                .withMessageContaining("Invalid postal code format");
-        Mockito.verify(petOwnerRepositoryMock).findById(request.getOwnerId());
-        Mockito.verify(addressLookupServiceMock).findByPostalCode(request.getPostalCode());
         Mockito.verifyNoInteractions(petRepositoryMock);
         Mockito.verifyNoInteractions(petMapperMock);
     }
@@ -232,7 +179,7 @@ class PetServiceTest {
 
         BDDMockito.when(petRepositoryMock.findById(1L))
                 .thenReturn(Optional.of(savedPet));
-        BDDMockito.when(petMapperMock.fromPutRequestToEntity(request, savedPet, savedPet.getAddress()))
+        BDDMockito.when(petMapperMock.fromPutRequestToEntity(request, savedPet))
                 .thenReturn(expectedPet);
         BDDMockito.when(petRepositoryMock.save(ArgumentMatchers.any(Pet.class)))
                 .thenReturn(expectedPet);
@@ -254,40 +201,6 @@ class PetServiceTest {
         Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> this.petService.replace(invalidPetPutRequest))
                 .withMessageContaining("Pet not found");
-    }
-
-    @Test
-    @DisplayName("replace does not updates pet when postal code is not found")
-    void replace_DoesNotUpdatesPet_WhenPostalCodeIsNotFound() {
-        PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
-        petPutRequest.setPostalCode("99999999");
-        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.of(PetCreator.createValidPet()));
-        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPutRequest.getPostalCode()))
-                .thenThrow(new ViaCepPostalCodeNotFoundException("Postal code not found"));
-
-        Assertions.assertThatExceptionOfType(ViaCepPostalCodeNotFoundException.class)
-                .isThrownBy(() -> this.petService.replace(petPutRequest))
-                .withMessageContaining("Postal code not found");
-
-        Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
-    }
-
-    @Test
-    @DisplayName("replace throws InvalidPostalCodeException when postal code is invalid")
-    void replace_ThrowsInvalidPostalCodeException_WhenPostalCodeIsInvalid() {
-        PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
-        petPutRequest.setPostalCode("99   9999999");
-        BDDMockito.when(petRepositoryMock.findById(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.of(PetCreator.createValidPet()));
-        BDDMockito.when(addressLookupServiceMock.findByPostalCode(petPutRequest.getPostalCode()))
-                .thenThrow(new InvalidPostalCodeException("Invalid postal code format"));
-
-        Assertions.assertThatExceptionOfType(InvalidPostalCodeException.class)
-                .isThrownBy(() -> this.petService.replace(petPutRequest))
-                .withMessageContaining("Invalid postal code format");
-
-        Mockito.verify(petRepositoryMock, Mockito.never()).save(ArgumentMatchers.any(Pet.class));
     }
 
     @Test
