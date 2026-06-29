@@ -1,5 +1,6 @@
 package com.projetos.diego.pet_management_system.mapper;
 
+import com.projetos.diego.pet_management_system.domain.owner.Address;
 import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.domain.owner.UserRole;
 import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
@@ -19,11 +20,16 @@ public class PetOwnerMapper {
                 .build();
     }
 
-    public PetOwner fromPostRequestToEntity(RegisterRequest request, String encodedPassword, UserRole role) {
+    public PetOwner fromPostRequestToEntity(
+            RegisterRequest request,
+            String encodedPassword,
+            UserRole role,
+            Address address) {
         return PetOwner.builder()
                 .name(request.getName())
                 .username(request.getUsername())
                 .password(encodedPassword)
+                .address(address)
                 .role(role)
                 .pets(List.of())
                 .build();

@@ -1,11 +1,9 @@
 package com.projetos.diego.pet_management_system.service;
 
-import com.projetos.diego.pet_management_system.domain.pet.Address;
-import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
+import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import com.projetos.diego.pet_management_system.dto.request.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.request.PetPutRequest;
-import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
@@ -51,34 +49,18 @@ public class PetService {
     public Pet save(PetPostRequest request) {
         PetOwner petOwner = petOwnerRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        Address address = addressLookupService.findByPostalCode(request.getPostalCode());
-        Pet pet = petMapper.fromPostRequestToEntity(request, address, petOwner);
+        Pet pet = petMapper.fromPostRequestToEntity(request, petOwner);
         return petRepository.save(pet);
     }
 
     public void replace(PetPutRequest request) {
         Pet savedPet = findPetsById(request.getId());
-        Address address = resolveAddress(request, savedPet);
-        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(request, savedPet, address);
+        Pet petToBeUpdated = petMapper.fromPutRequestToEntity(request, savedPet);
         petRepository.save(petToBeUpdated);
     }
 
     public void delete(long id) {
         Pet petToBeDeleted = findPetsById(id);
         petRepository.delete(petToBeDeleted);
-    }
-
-    public boolean postalCodeChanged(PetPutRequest request, Pet savedPet) {
-        if (request.getPostalCode() == null) {
-            throw new InvalidPostalCodeException("Postal code cannot be null");
-        }
-        return !(request.getPostalCode().equals(savedPet.getAddress().getPostalCode()));
-    }
-
-    public Address resolveAddress(PetPutRequest request, Pet savedPet) {
-        if (postalCodeChanged(request, savedPet)) {
-            return addressLookupService.findByPostalCode(request.getPostalCode());
-        }
-        return savedPet.getAddress();
     }
 }

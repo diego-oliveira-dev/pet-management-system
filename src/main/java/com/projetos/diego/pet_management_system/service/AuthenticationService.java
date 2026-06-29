@@ -2,9 +2,9 @@ package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.domain.owner.UserRole;
-import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.dto.request.LoginRequest;
 import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
+import com.projetos.diego.pet_management_system.dto.response.AuthenticationResponse;
 import com.projetos.diego.pet_management_system.dto.response.PetOwnerResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidCredentialsException;
 import com.projetos.diego.pet_management_system.exception.UsernameAlreadyExistsException;
@@ -30,6 +30,7 @@ public class AuthenticationService {
     private final PetOwnerMapper petOwnerMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AddressLookupService addressLookupService;
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
@@ -39,7 +40,8 @@ public class AuthenticationService {
         PetOwner ownerToBeSaved = petOwnerMapper.fromPostRequestToEntity(
                 request,
                 passwordEncoder.encode(request.getPassword()),
-                UserRole.USER);
+                UserRole.USER,
+                addressLookupService.findByPostalCode(request.getPostalCode()));
         PetOwner savedOwner = petOwnerRepository.save(ownerToBeSaved);
         return issueToken(new UserAuthenticated(savedOwner));
     }

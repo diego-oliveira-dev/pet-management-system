@@ -26,6 +26,9 @@ public class PetOwner {
     @Column(nullable = false)
     private String password;
 
+    @Embedded
+    private Address address;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
