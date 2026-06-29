@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PetRepository extends JpaRepository<Pet, Long> {
-    List<Pet> findByNameContaining(String name);
+    List<Pet> findByNameContainingAndPetOwnerId(String name, long ownerId);
     List<Pet> findByPetOwnerId(Long id);
 }

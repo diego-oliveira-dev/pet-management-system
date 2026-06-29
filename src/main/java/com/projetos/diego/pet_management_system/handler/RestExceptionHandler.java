@@ -118,6 +118,16 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(PetAccessDeniedException.class)
+    public ResponseEntity<ExceptionDetails> handleInvalidCredentials(PetAccessDeniedException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "Access Denied",
+                HttpStatus.FORBIDDEN);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<ExceptionDetails> handleAlreadyExistingUsername(UsernameAlreadyExistsException exception) {
         ExceptionDetails exceptionDetails = createExceptionDetails(

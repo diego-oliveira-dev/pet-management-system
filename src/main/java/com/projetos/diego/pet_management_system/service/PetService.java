@@ -4,6 +4,7 @@ import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import com.projetos.diego.pet_management_system.dto.request.PetPostRequest;
 import com.projetos.diego.pet_management_system.dto.request.PetPutRequest;
+import com.projetos.diego.pet_management_system.exception.PetAccessDeniedException;
 import com.projetos.diego.pet_management_system.exception.ResourceNotFoundException;
 import com.projetos.diego.pet_management_system.mapper.PetMapper;
 import com.projetos.diego.pet_management_system.repository.PetOwnerRepository;
@@ -21,29 +22,26 @@ public class PetService {
     private final PetRepository petRepository;
     private final PetOwnerRepository petOwnerRepository;
     private final PetMapper petMapper;
-    private final AddressLookupService addressLookupService;
 
     public Page<Pet> listAll(Pageable pageable) {
         return petRepository.findAll(pageable);
     }
 
-    public List<Pet> listAllNonPageable() {
-        return petRepository.findAll();
-    }
-
-    public Pet findPetsById(long id) {
-        return petRepository.findById(id)
+    public Pet findPetByIdAndPetOwnerId(long id, long ownerId) {
+        Pet pet = petRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
+        if (!pet.getPetOwner().getId().equals(ownerId)) {
+            throw new PetAccessDeniedException("Access denied");
+        }
+        return pet;
     }
 
-    public List<Pet> findPetsByOwnerId(long id) {
-        petOwnerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        return petRepository.findByPetOwnerId(id);
+    public List<Pet> findPetsByOwnerId(long ownerId) {
+        return petRepository.findByPetOwnerId(ownerId);
     }
 
-    public List<Pet> findByName(String name) {
-        return petRepository.findByNameContaining(name);
+    public List<Pet> findPetsByName(String name, long userId) {
+        return petRepository.findByNameContainingAndPetOwnerId(name, userId);
     }
 
     public Pet save(PetPostRequest request) {
@@ -53,14 +51,15 @@ public class PetService {
         return petRepository.save(pet);
     }
 
-    public void replace(PetPutRequest request) {
-        Pet savedPet = findPetsById(request.getId());
+    public void replace(PetPutRequest request, long ownerId) {
+        Pet savedPet = findPetByIdAndPetOwnerId(request.getId(), ownerId);
         Pet petToBeUpdated = petMapper.fromPutRequestToEntity(request, savedPet);
         petRepository.save(petToBeUpdated);
     }
 
     public void delete(long id) {
-        Pet petToBeDeleted = findPetsById(id);
+        Pet petToBeDeleted = petRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));;
         petRepository.delete(petToBeDeleted);
     }
 }
