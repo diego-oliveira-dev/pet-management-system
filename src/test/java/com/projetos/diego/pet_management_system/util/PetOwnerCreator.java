@@ -11,6 +11,7 @@ import java.util.List;
 public class PetOwnerCreator {
     public static PetOwner createValidPetOwner() {
         return PetOwner.builder()
+                .id(1L)
                 .name("Diego Oliveira")
                 .username("diego123")
                 .password("secret123")

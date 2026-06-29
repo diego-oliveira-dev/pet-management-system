@@ -19,6 +19,18 @@ public class JwtCreator {
                 );
     }
 
+    public static RequestPostProcessor createUserJWTById(Long userId) {
+        return jwt().jwt(
+                jwt -> jwt
+                        .issuer("pet-management-system")
+                        .subject(userId.toString())
+                        .claim("authorities", "ROLE_USER")
+                        .build())
+                .authorities(
+                        new SimpleGrantedAuthority("ROLE_USER")
+                );
+    }
+
     public static RequestPostProcessor createAdminJWT() {
         return jwt().jwt(
                 jwt -> jwt
