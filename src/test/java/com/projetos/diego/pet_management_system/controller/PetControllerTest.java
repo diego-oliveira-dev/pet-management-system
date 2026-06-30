@@ -222,18 +222,18 @@ class PetControllerTest {
     @Test
     @DisplayName("save returns 201 when successful")
     void save_Returns201_WhenSuccessful() throws Exception {
-        PetPostRequest petPostRequest = PetCreator.createPetPostRequest();
+        PetPostRequest request = PetCreator.createPetPostRequest();
         Pet pet = PetCreator.createValidPet();
         PetResponse response = PetCreator.createResponse(pet);
 
-        Mockito.when(petServiceMock.save(petPostRequest)).thenReturn(pet);
+        Mockito.when(petServiceMock.save(request, pet.getPetOwner().getId())).thenReturn(pet);
         Mockito.when(petMapperMock.toResponse(pet)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/pets")
                         .with(JwtCreator.createUserJWT())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petPostRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
                         .value(response.id()))
@@ -288,15 +288,16 @@ class PetControllerTest {
     @Test
     @DisplayName("replace returns 204 when successful")
     void replace_Returns204_WhenSuccessful() throws Exception {
-        PetPutRequest petPutRequest = PetCreator.createPetPutRequest();
+        long ownerId = 1L;
+        PetPutRequest request = PetCreator.createPetPutRequest();
 
         mockMvc.perform(MockMvcRequestBuilders.put("/pets")
-                        .with(JwtCreator.createUserJWT())
+                        .with(JwtCreator.createUserJWTById(ownerId))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petPutRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
         Mockito.verify(petServiceMock, Mockito.times(1))
-                .replace(petPutRequest, petPutRequest.getOwnerId());
+                .replace(request, ownerId);
     }
 
     @Test

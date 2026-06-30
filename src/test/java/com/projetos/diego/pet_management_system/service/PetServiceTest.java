@@ -58,7 +58,7 @@ class PetServiceTest {
                 .thenReturn(Optional.empty());
 
         Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> this.petService.findPetByIdAndPetOwnerId(3L, ArgumentMatchers.anyLong()))
+                .isThrownBy(() -> this.petService.findPetByIdAndPetOwnerId(3L, 1L))
                 .withMessageContaining("Pet not found");
     }
 
@@ -87,51 +87,34 @@ class PetServiceTest {
     void save_PersistsPet_WhenSuccessful() {
         PetPostRequest request = PetCreator.createPetPostRequest();
         PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
+        petOwner.setId(1L);
         Pet pet = PetCreator.createValidPet();
+        pet.setPetOwner(petOwner);
 
-        BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
+        BDDMockito.when(petOwnerRepositoryMock.findById(petOwner.getId()))
                 .thenReturn(Optional.of(petOwner));
         BDDMockito.when(petMapperMock.fromPostRequestToEntity(request, petOwner))
                 .thenReturn(pet);
         BDDMockito.when(petRepositoryMock.save(pet))
                 .thenReturn(pet);
 
-        Pet savedPet = petService.save(request);
+        Pet savedPet = petService.save(request, petOwner.getId());
 
         Assertions.assertThat(savedPet).isNotNull().isEqualTo(pet);
     }
 
     @Test
-    @DisplayName("save persists pet when only required fields are provided")
-    void save_PersistsPet_WhenOnlyRequiredFieldsAreProvided() {
+    @DisplayName("save throws ResourceNotFoundException when owner is not found")
+    void save_ThrowsResourceNotFoundException_WhenOwnerIsNotFound() {
+        long ownerId = 1L;
         PetPostRequest request = PetCreator.createPetPostRequest();
-        request.setBreed(null);
-        PetOwner petOwner = PetOwnerCreator.createValidPetOwner();
-        Pet pet = PetCreator.createValidPet();
-
-        BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
-                .thenReturn(Optional.of(petOwner));
-        BDDMockito.when(petMapperMock.fromPostRequestToEntity(request, petOwner))
-                .thenReturn(pet);
-        BDDMockito.when(petRepositoryMock.save(pet))
-                .thenReturn(pet);
-
-        Pet savedPet = petService.save(request);
-
-        Assertions.assertThat(savedPet).isNotNull().isEqualTo(pet);
-    }
-
-    @Test
-    @DisplayName("save does not persists pet when owner is not found")
-    void save_DoesNotPersistsPet_WhenOwnerIsNotFound() {
-        PetPostRequest request = PetCreator.createPetPostRequest();
-        BDDMockito.when(petOwnerRepositoryMock.findById(request.getOwnerId()))
+        BDDMockito.when(petOwnerRepositoryMock.findById(ownerId))
                 .thenReturn(Optional.empty());
 
         Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> this.petService.save(request))
+                .isThrownBy(() -> this.petService.save(request, ownerId))
                 .withMessageContaining("Owner not found");
-        Mockito.verify(petOwnerRepositoryMock).findById(request.getOwnerId());
+        Mockito.verify(petOwnerRepositoryMock).findById(ownerId);
         Mockito.verifyNoInteractions(petRepositoryMock);
         Mockito.verifyNoInteractions(petMapperMock);
     }
@@ -222,7 +205,7 @@ class PetServiceTest {
                 .thenReturn(Optional.empty());
 
         Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> this.petService.delete(ArgumentMatchers.anyLong()))
+                .isThrownBy(() -> this.petService.delete(1L))
                 .withMessageContaining("Pet not found");
 
         Mockito.verify(petRepositoryMock, Mockito.never()).delete(ArgumentMatchers.any(Pet.class));
