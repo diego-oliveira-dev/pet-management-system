@@ -44,8 +44,8 @@ public class PetService {
         return petRepository.findByNameContainingAndPetOwnerId(name, userId);
     }
 
-    public Pet save(PetPostRequest request) {
-        PetOwner petOwner = petOwnerRepository.findById(request.getOwnerId())
+    public Pet save(PetPostRequest request, long ownerId) {
+        PetOwner petOwner = petOwnerRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         Pet pet = petMapper.fromPostRequestToEntity(request, petOwner);
         return petRepository.save(pet);

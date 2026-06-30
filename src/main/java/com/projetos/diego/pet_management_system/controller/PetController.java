@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Log4j2
 @RestController
 @RequestMapping("pets")
 @RequiredArgsConstructor
@@ -102,8 +100,11 @@ public class PetController {
             @ApiResponse(responseCode = "502", description = "Address lookup service did not function correctly")
     })
     @PostMapping
-    public ResponseEntity<PetResponse> save(@RequestBody @Valid PetPostRequest request) {
-        Pet savedPet = petService.save(request);
+    public ResponseEntity<PetResponse> save(
+            @RequestBody @Valid PetPostRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        long userId = Long.parseLong(jwt.getSubject());
+        Pet savedPet = petService.save(request, userId);
         PetResponse response = petMapper.toResponse(savedPet);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

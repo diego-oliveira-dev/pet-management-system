@@ -54,10 +54,4 @@ public class PetPostRequest {
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
             nullable = true)
     private String breed;
-
-    @NotNull(message = "Pet owner ID cannot be null")
-    @Schema(description = "This is the pet's owner name.",
-            example = "Diego Oliveira",
-            requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long ownerId;
 }
