@@ -1,5 +1,6 @@
-package com.projetos.diego.pet_management_system.domain;
+package com.projetos.diego.pet_management_system.domain.pet;
 
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,9 +35,6 @@ public class Pet {
     private Double weight;
 
     private String breed;
-
-    @Embedded
-    private Address address;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)

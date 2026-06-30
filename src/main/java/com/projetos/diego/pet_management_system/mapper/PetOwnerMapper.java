@@ -1,8 +1,10 @@
 package com.projetos.diego.pet_management_system.mapper;
 
-import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
-import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
+import com.projetos.diego.pet_management_system.domain.owner.Address;
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
+import com.projetos.diego.pet_management_system.domain.owner.UserRole;
+import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
+import com.projetos.diego.pet_management_system.dto.response.PetOwnerResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,12 +16,21 @@ public class PetOwnerMapper {
         return PetOwnerResponse.builder()
                 .id(owner.getId())
                 .name(owner.getName())
+                .username(owner.getUsername())
                 .build();
     }
 
-    public PetOwner fromPostRequestToEntity(PetOwnerPostRequest request) {
+    public PetOwner fromPostRequestToEntity(
+            RegisterRequest request,
+            String encodedPassword,
+            UserRole role,
+            Address address) {
         return PetOwner.builder()
                 .name(request.getName())
+                .username(request.getUsername())
+                .password(encodedPassword)
+                .address(address)
+                .role(role)
                 .pets(List.of())
                 .build();
     }

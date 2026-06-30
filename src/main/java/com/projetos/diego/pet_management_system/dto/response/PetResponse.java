@@ -1,10 +1,8 @@
-package com.projetos.diego.pet_management_system.dto;
+package com.projetos.diego.pet_management_system.dto.response;
 
-import com.projetos.diego.pet_management_system.domain.Address;
-import com.projetos.diego.pet_management_system.domain.Pet;
+import com.projetos.diego.pet_management_system.domain.owner.Address;
+import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDate;
 

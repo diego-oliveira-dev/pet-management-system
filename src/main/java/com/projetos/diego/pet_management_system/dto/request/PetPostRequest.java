@@ -1,8 +1,7 @@
-package com.projetos.diego.pet_management_system.dto;
+package com.projetos.diego.pet_management_system.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.domain.PetOwner;
+import com.projetos.diego.pet_management_system.domain.pet.Pet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -55,18 +54,4 @@ public class PetPostRequest {
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
             nullable = true)
     private String breed;
-
-    @Pattern(regexp = "^\\d{8}$", message = "Postal code must be exactly 8 digits long")
-    @NotBlank(message = "Pet postal code cannot be empty, blank or null")
-    @Schema(description = "This is the postal code of the owner. Must be exactly 8 digits long without empty spaces",
-            example = "64009100",
-            requiredMode = Schema.RequiredMode.REQUIRED,
-            nullable = true)
-    private String postalCode;
-
-    @NotNull(message = "Pet owner ID cannot be null")
-    @Schema(description = "This is the pet's owner name.",
-            example = "Diego Oliveira",
-            requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long ownerId;
 }

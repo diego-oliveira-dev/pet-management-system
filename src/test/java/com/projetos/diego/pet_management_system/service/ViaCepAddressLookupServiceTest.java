@@ -1,11 +1,11 @@
 package com.projetos.diego.pet_management_system.service;
 
 import com.projetos.diego.pet_management_system.client.ViaCepClient;
-import com.projetos.diego.pet_management_system.client.ViaCepResponse;
-import com.projetos.diego.pet_management_system.domain.Address;
+import com.projetos.diego.pet_management_system.domain.owner.Address;
+import com.projetos.diego.pet_management_system.dto.response.ViaCepResponse;
 import com.projetos.diego.pet_management_system.exception.InvalidPostalCodeException;
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
-import com.projetos.diego.pet_management_system.util.PetCreator;
+import com.projetos.diego.pet_management_system.util.PetOwnerCreator;
 import com.projetos.diego.pet_management_system.util.ViaCepResponseCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class ViaCepAddressLookupServiceTest {
                 .thenReturn(response);
 
         Address address = viaCepAddressLookupService.findByPostalCode(validPostalCode);
-        Address expectedAddress = PetCreator.createValidAddress();
+        Address expectedAddress = PetOwnerCreator.createValidAddress();
 
         Assertions.assertThat(address).isNotNull().isEqualTo(expectedAddress);
         Mockito.verify(viaCepClientMock, Mockito.times(1))

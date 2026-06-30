@@ -1,5 +1,6 @@
 package com.projetos.diego.pet_management_system.client;
 
+import com.projetos.diego.pet_management_system.dto.response.ViaCepResponse;
 import com.projetos.diego.pet_management_system.exception.ViaCepMalformedDataException;
 import com.projetos.diego.pet_management_system.exception.ViaCepPostalCodeNotFoundException;
 import com.projetos.diego.pet_management_system.exception.ViaCepUnavailableException;

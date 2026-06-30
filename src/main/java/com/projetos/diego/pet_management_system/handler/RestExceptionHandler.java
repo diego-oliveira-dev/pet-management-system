@@ -108,6 +108,36 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(exceptionDetails, HttpStatus.BAD_GATEWAY);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ExceptionDetails> handleInvalidCredentials(InvalidCredentialsException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "Invalid Credentials",
+                HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(PetAccessDeniedException.class)
+    public ResponseEntity<ExceptionDetails> handleInvalidCredentials(PetAccessDeniedException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "Access Denied",
+                HttpStatus.FORBIDDEN);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ExceptionDetails> handleAlreadyExistingUsername(UsernameAlreadyExistsException exception) {
+        ExceptionDetails exceptionDetails = createExceptionDetails(
+                exception,
+                "Invalid Username",
+                HttpStatus.CONFLICT);
+
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionDetails> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();

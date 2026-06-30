@@ -1,13 +1,11 @@
 package com.projetos.diego.pet_management_system.util;
 
-import com.projetos.diego.pet_management_system.domain.Pet;
-import com.projetos.diego.pet_management_system.domain.PetOwner;
-import com.projetos.diego.pet_management_system.dto.PetOwnerPostRequest;
-import com.projetos.diego.pet_management_system.dto.PetOwnerResponse;
-import com.projetos.diego.pet_management_system.dto.PetPostRequest;
-import com.projetos.diego.pet_management_system.dto.PetResponse;
+import com.projetos.diego.pet_management_system.domain.owner.Address;
+import com.projetos.diego.pet_management_system.domain.owner.PetOwner;
+import com.projetos.diego.pet_management_system.domain.owner.UserRole;
+import com.projetos.diego.pet_management_system.dto.request.RegisterRequest;
+import com.projetos.diego.pet_management_system.dto.response.PetOwnerResponse;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class PetOwnerCreator {
@@ -15,7 +13,20 @@ public class PetOwnerCreator {
         return PetOwner.builder()
                 .id(1L)
                 .name("Diego Oliveira")
+                .username("diego123")
+                .password("secret123")
+                .role(UserRole.USER)
                 .pets(List.of())
+                .build();
+    }
+
+    public static Address createValidAddress() {
+        return Address.builder()
+                .street("Rua José Marques da Rocha")
+                .neighbourhood("Memorare")
+                .city("Teresina")
+                .state("PI")
+                .postalCode("64009100")
                 .build();
     }
 
@@ -23,12 +34,8 @@ public class PetOwnerCreator {
         return PetOwnerResponse.builder()
                 .id(owner.getId())
                 .name(owner.getName())
-                .build();
-    }
-
-    public static PetOwnerPostRequest createPetOwnerPostRequest() {
-        return PetOwnerPostRequest.builder()
-                .name("Diego Oliveira")
+                .username(owner.getUsername())
+                .address(createValidAddress())
                 .build();
     }
 }
